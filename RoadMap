@@ -1,0 +1,256 @@
+## 1. Stack technique proposée
+
+### 1.1. Langage & runtime
+
+* **Langage** : Prolog (SWI-Prolog, comme prévu par le squelette).
+* **Interpréteur** :
+
+  * Installer **SWI-Prolog** (swipl).
+  * Commande de base pour lancer le bot :
+
+    ```bash
+    swipl -s grandgousier.pl
+    ```
+  * Éventuellement un petit script `run.sh` ou `run.bat` pour faciliter les tests.
+
+### 1.2. IDE / éditeur (JetBrains)
+
+Tu as une licence JetBrains, donc :
+
+* **IDE principal** : **IntelliJ IDEA** (Community ou Ultimate).
+* **Pour Prolog** :
+
+  * Utiliser un **plugin Prolog** (pour la coloration, indentation, etc.) si vous en trouvez un compatible.
+  * Sinon, IntelliJ reste très bien pour l’édition (git intégré, search, etc.), et vous lancez SWI-Prolog dans un terminal à côté.
+* Organisation suggérée des fichiers :
+
+  * `src/grandgousier.pl` (code final)
+  * `src/grandgousier-elm.pl` (référence / brouillon)
+  * `src/eliza.pl` (si besoin pour s’inspirer)
+  * `data/grafe-lecocq.tex` (texte des vins)
+  * `doc/` pour le rapport
+
+### 1.3. Gestion de versions / collaboration
+
+* **Git + GitHub** :
+
+  * Un seul repo, par ex. `unamur-grandgousier-2025`.
+  * Branch principale : `main`.
+  * Branches de travail : `feature/…`, par ex. `feature/moteur-regles`, `feature/base-vins`, etc.
+
+Fichiers utiles :
+
+* `.gitignore` :
+
+  * Ignorer : fichiers temporaires, `.swp`, `.DS_Store`, éventuellement build/log si vous en générez.
+* `README.md` :
+
+  * Comment lancer le programme.
+  * Version de SWI-Prolog testée.
+  * Auteurs.
+
+### 1.4. Documentation / rapport
+
+* Vu la présence de `grafe-lecocq.tex`, **LaTeX** est naturel pour le rapport :
+
+  * `doc/rapport.tex`
+  * Compilation via latexmk ou Overleaf (à vous de voir).
+* Si vous préférez simple : **Markdown** + export PDF.
+  Mais je parierais que le prof aime bien LaTeX 😄
+
+---
+
+## 2. Organisation à deux sur GitHub
+
+### 2.1. Rôles (mais vous tournez régulièrement)
+
+* **Personne A – “moteur & règles”**
+
+  * Comprendre en détail `produire_reponse/2`, `mclef/2`, `regle_rep/4`.
+  * Implémenter les règles de dialogue (patterns, conditions).
+* **Personne B – “base de connaissances & rapport”**
+
+  * Extraire les infos de `grafe-lecocq.tex`.
+  * Construire les faits Prolog : `nom/2`, `prix/2`, `nez/2`, `bouche/2`, `description/2`, `appellation/2`, etc.
+  * Documenter les choix dans le rapport.
+
+Mais **chacun relit le code de l’autre** via des pull requests.
+
+### 2.2. Workflow Git simple
+
+1. Un de vous crée le repo sur GitHub et pousse le squelette `grandgousier.pl`.
+2. Pour chaque évolution :
+
+   * `git checkout -b feature/mclef`
+   * coder / tester
+   * `git commit` + `git push`
+   * ouvrir une Pull Request, l’autre relit.
+3. Merge dans `main` seulement quand ça tourne (tests manuels de quelques dialogues).
+
+---
+
+## 3. Roadmap du projet
+
+Je te fais une roadmap **progressive**, en suivant aussi le conseil de l’énoncé (“du plus simple au plus complexe”).
+
+### Étape 0 — Mise en place (très rapide)
+
+* Créer le repo GitHub et y mettre :
+
+  * `grandgousier.pl` (squelette fourni)
+  * `projet.pdf`, `grafe-lecocq.tex` dans `data/` ou `doc/`
+* Vérifier que :
+
+  * `swipl -s grandgousier.pl` lance bien le bot.
+  * Une question triviale donne la réponse par défaut (“je ne sais pas”).
+
+---
+
+### Étape 1 — Compréhension & mini-tests
+
+* Lire attentivement :
+
+  * Le fonctionnement de `read_atomics/1` et `ecrire_reponse/1`.
+  * Le code fourni dans le squelette (notamment les exemples de `bouche/2`, `nez/2`, `mclef/2`, `regle_rep/4`).
+* Faire de **petits tests** :
+
+  * Tester une règle déjà codée (par ex. la règle sur `bouche` ou les prix min/max).
+  * Comprendre comment `match_pattern/2` et `nom_vins_uniforme/2` fonctionnent.
+
+Objectif : être à l’aise avec le fait que **tout se fait via des listes de mots en minuscules**.
+
+---
+
+### Étape 2 — Première version “minimale” des dialogues simples
+
+Cibler d’abord les **4 questions “simples”** de l’énoncé :
+
+1. “Quels vins de Bourgogne me conseillez-vous ?”
+2. “Que donne le Nuits-Saint-Georges en bouche ?”
+3. “Quel nez présente le Chambolle-Musigny ?”
+4. “Que recouvre l’appellation Haut-Médoc ?”
+
+Sous-tâches :
+
+* Définir quelques vins dans la base Prolog :
+
+  * `nom(Id, 'Appellation complète').`
+  * `prix(Id, Prix).`
+  * `nez(Id, Texte).`
+  * `bouche(Id, Texte).`
+  * `description(Id, Texte).`
+  * `appellation(Id, RegionOuTexte).`
+* Créer des premières règles `mclef/2` (par ex. `mclef(bourgogne, 10).`, `mclef(appellation, 10).`, etc.).
+* Pour chaque type de question, une règle `regle_rep/4` avec un **pattern réaliste** (liste de mots minuscules, sans ponctuation) et une réponse en liste de listes.
+
+Objectif : **reproduire ces 4 dialogues** (à quelques détails près) en restant propre.
+
+---
+
+### Étape 3 — Gestion des “autres vins de Bourgogne” & prix
+
+On passe aux dialogues plus avancés :
+
+1. “Auriez-vous d’autres vins de Bourgogne ?”
+2. “Auriez-vous des vins entre 20 et 35 EUR ?”
+
+Sous-tâches :
+
+* Concevoir une stratégie pour “autres vins de Bourgogne” :
+
+  * Garder en mémoire les vins déjà proposés ? (via un prédicat dynamique ou un choix simple : séparer première recommandation et “autres” via des listes différentes).
+* Utiliser / adapter les prédicats déjà présents pour les **prix min/max** (il y a déjà des éléments dans le squelette) :
+
+  * `prix_vin_min_max/4`, `lvins_prix_min_max/3`, `rep_lvins_min_max/2`, etc.
+* Ajouter les `regle_rep/4` correspondantes :
+
+  * Pattern pour la question “auriezvous des vins entre X et Y eur” (comme dans le squelette).
+  * Un ou deux patterns pour “autres vins de bourgogne”.
+
+Objectif : les deux questions sur les **autres vins** et les **tranches de prix** doivent fonctionner.
+
+---
+
+### Étape 4 — Description détaillée d’un vin & liens avec les textes
+
+Dialogue :
+“Pourriez-vous m’en dire plus sur La Fleur de Pomys ?”
+
+Sous-tâches :
+
+* Récupérer dans `grafe-lecocq.tex` la **description** textuelle de ce vin, et la transformer en :
+
+  * `description(id_fleur_de_pomys_2012, [[...],[...],...]).`
+* Ajouter une **règle** `regle_rep(description, …)` ou similaire :
+
+  * Pattern incluant le nom du vin normalisé (via `nom_vins_uniforme/2` si nécessaire).
+  * La réponse se base sur `description/2`.
+
+Objectif : question sur “en dire plus” → affichage de la description structurée en lignes.
+
+---
+
+### Étape 5 — Recommandation par plat (canard)
+
+Dialogue :
+“Pour Noël, j’envisage de cuisiner du canard. Quel vin me conseillez-vous ?”
+
+Sous-tâches :
+
+* Créer un petit **module de règles d’association plats–profils de vin** :
+
+  * par ex. `profil(canard, rouge_puissant_epice_fume).`
+  * et des associations de profils à régions / appellations.
+* Concevoir `regle_rep(plat, …)` qui :
+
+  * détecte `noel` / `canard` / `viande` dans la question.
+  * renvoie un texte du type de celui de l’énoncé.
+
+Objectif : donner au moins les familles de vins proposées (Haut-Médoc, Graves, etc.).
+
+---
+
+### Étape 6 — Robustesse, variantes & petits plus
+
+* Gérer quelques **variantes linguistiques** :
+
+  * “quels vins de bourgogne pouvez vous me conseiller”
+  * “je cherche des vins de bourgogne”
+* Ajouter des **règles par défaut** un peu plus fines que le simple “je ne sais pas”.
+* Enrichir la base de vins si vous avez encore du temps (toujours à partir des textes fournis, pas d’invention).
+
+---
+
+### Étape 7 — Rapport
+
+Structure possible :
+
+1. **Introduction**
+
+   * Description du problème (bot conseiller en vins).
+   * Contexte du projet.
+2. **Stack & outils**
+
+   * SWI-Prolog, organisation du code, organisation GitHub.
+3. **Architecture du programme**
+
+   * Rôle de `read_atomics/1`, `produire_reponse/2`, `ecrire_reponse/1`, boucle `grandgousier/0`.
+4. **Représentation des connaissances**
+
+   * Faits `nom/2`, `prix/2`, `nez/2`, `bouche/2`, `description/2`, `appellation/2`, etc.
+5. **Moteur de règles**
+
+   * `mclef/2`, `regle_rep/4`, patterns, prédicats auxiliaires (`match_pattern`, etc.).
+6. **Exemples de dialogues**
+
+   * Capture d’écran ou transcript de dialogues correspondant à ceux de l’énoncé + autres imaginés.
+7. **Limites & améliorations possibles**
+
+   * Ce que vous n’avez pas eu le temps de faire, pistes d’extension.
+
+---
+
+Si tu veux, à la prochaine étape on peut :
+
+* détailler l’architecture du repo (fichiers précis), **ou**
+* commencer directement par définir les premiers `mclef/2` et `regle_rep/4` nécessaires pour “Quels vins de Bourgogne me conseillez-vous ?”.
