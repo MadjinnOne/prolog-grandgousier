@@ -88,8 +88,10 @@ replace_vin(L,X,[H|In],[H|Out]) :-
 mclef(bouche,10).
 mclef(nez,10).
 mclef(prix,10).
+mclef(description, 10).
 mclef(vin,5).
 mclef(vins,5).
+mclef(pourriezvous, 10).
 
 
 % ----------------------------------------------------------------%
@@ -101,6 +103,23 @@ regle_rep(bouche,1,
      bouche(Vin,Rep).
 
 % ----------------------------------------------------------------%
+
+regle_rep(nez,1,
+  [ quel, nez, presente, le, Vin ],
+  Rep) :-
+    nez(Vin, Rep).
+
+% ----------------------------------------------------------------%
+
+regle_rep(pourriezvous, 1,
+  [ pourriezvous, men, dire, plus, sur, le, Vin ],
+  Rep ) :-
+    description(Vin, Rep).
+
+    
+% ----------------------------------------------------------------%   
+
+
 
 regle_rep(vins,2,
   [ auriezvous, des, vins, entre, X, et, Y, eur ],
