@@ -1,5 +1,5 @@
 :- use_module(library(lists)).
-:- [base_vins].      % <--- on charge la base de connaissances
+:- use_module(base_vins).      % <--- on charge la base de connaissances
 /* --------------------------------------------------------------------- */
 /*                                                                       */
 /*        PRODUIRE_REPONSE(L_Mots,L_Lignes_reponse) :                    */
