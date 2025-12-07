@@ -73,8 +73,19 @@ prefixrem([H|T],[H|L],Lr) :- prefixrem(T,L,Lr).
 nom_vins_uniforme(Lmots,L_mots_unif) :-
    L1 = Lmots,
    replace_vin([beaumes,de,venise,2015],beaumes_de_venise_2015,L1,L2),
-   replace_vin([les,chaboeufs,2013],les_chaboeufs_2013,L2,L3),
-   L_mots_unif = L3.
+   replace_vin([beaumes,de,venise],beaumes_de_venise_2015,L2,L3),
+
+   replace_vin([nuits,saint,georges,2013],les_chaboeufs_2013,L3,L4),
+   replace_vin([nuits,saint,georges,premier,cru,2013],les_chaboeufs_2013,L4,L5),
+   replace_vin([les,chaboeufs,2013],les_chaboeufs_2013,L5,L6),
+   replace_vin([nuits,saint,georges],les_chaboeufs_2013,L6,L7),
+
+   replace_vin([chambolle,musigny,premier,cru,2012],chambolle_musigny_premier_cru_2012,L7,L8),
+   replace_vin([chambolle,musigny,2012],chambolle_musigny_premier_cru_2012,L8,L9),
+   replace_vin([chambolle,musigny],chambolle_musigny_premier_cru_2012,L9,L10),
+
+   replace_vin([la,fleur,de,pomys,2012],la_fleur_de_pomys_2012,L10,L11),
+   replace_vin([la,fleur,de,pomys],la_fleur_de_pomys_2012,L11,L_mots_unif).
 
 replace_vin(L,X,In,Out) :-
    append(L,Suf,In), !, Out = [X|Suf].
