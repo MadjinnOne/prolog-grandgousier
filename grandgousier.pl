@@ -71,44 +71,21 @@ prefixrem([],L,L).
 prefixrem([H|T],[H|L],Lr) :- prefixrem(T,L,Lr).
 
 nom_vins_uniforme(Lmots,L_mots_unif) :-
-   vin_patterns(Patterns),
-   replace_all_vins(Patterns,Lmots,L_mots_unif).
+   L1 = Lmots,
+   replace_vin([beaumes,de,venise,2015],beaumes_de_venise_2015,L1,L2),
+   replace_vin([beaumes,de,venise],beaumes_de_venise_2015,L2,L3),
 
-vin_patterns(Patterns) :-
-   findall((Tokens,Id), vin_tokens(Id,Tokens), AllPairs),
-   sort_vin_patterns(AllPairs,Patterns).
+   replace_vin([nuits,saint,georges,2013],les_chaboeufs_2013,L3,L4),
+   replace_vin([nuits,saint,georges,premier,cru,2013],les_chaboeufs_2013,L4,L5),
+   replace_vin([les,chaboeufs,2013],les_chaboeufs_2013,L5,L6),
+   replace_vin([nuits,saint,georges],les_chaboeufs_2013,L6,L7),
 
-sort_vin_patterns(Pairs,Sorted) :-
-   maplist(add_length_key,Pairs,Keyed),
-   keysort(Keyed,KeyedSorted),
-   maplist(remove_length_key,KeyedSorted,Sorted).
+   replace_vin([chambolle,musigny,premier,cru,2012],chambolle_musigny_premier_cru_2012,L7,L8),
+   replace_vin([chambolle,musigny,2012],chambolle_musigny_premier_cru_2012,L8,L9),
+   replace_vin([chambolle,musigny],chambolle_musigny_premier_cru_2012,L9,L10),
 
-add_length_key((Tokens,Id),(-Len,(Tokens,Id))) :-
-   length(Tokens,Len).
-
-remove_length_key(_Key-(Tokens,Id),(Tokens,Id)).
-
-vin_tokens(Id,Tokens) :-
-   nom(Id,Label),
-   label_tokens(Label,Tokens).
-vin_tokens(Id,Stem) :-
-   nom(Id,Label),
-   label_tokens(Label,Tokens),
-   append(Stem,[Last],Tokens),
-   atom_number(Last,_),
-   Stem \= [].
-
-label_tokens(Label,TokensAtoms) :-
-   downcase_atom(Label,Lower),
-   atom_string(Lower,LowerStr),
-   split_string(LowerStr," '-.,()/", " '-.,()/",Tokens0),
-   exclude(=(""),Tokens0,TokensStrings),
-   maplist(atom_string,TokensAtoms,TokensStrings).
-
-replace_all_vins([],L,L).
-replace_all_vins([(Tokens,Id)|Rest],LIn,LOut) :-
-   replace_vin(Tokens,Id,LIn,LTemp),
-   replace_all_vins(Rest,LTemp,LOut).
+   replace_vin([la,fleur,de,pomys,2012],la_fleur_de_pomys_2012,L10,L11),
+   replace_vin([la,fleur,de,pomys],la_fleur_de_pomys_2012,L11,L_mots_unif).
 
 replace_vin(L,X,In,Out) :-
    append(L,Suf,In), !, Out = [X|Suf].
