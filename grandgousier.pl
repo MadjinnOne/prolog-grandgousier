@@ -71,10 +71,45 @@ prefixrem([],L,L).
 prefixrem([H|T],[H|L],Lr) :- prefixrem(T,L,Lr).
 
 nom_vins_uniforme(Lmots,L_mots_unif) :-
-   L1 = Lmots,
-   replace_vin([beaumes,de,venise,2015],beaumes_de_venise_2015,L1,L2),
-   replace_vin([les,chaboeufs,2013],les_chaboeufs_2013,L2,L3),
-   L_mots_unif = L3.
+   vin_patterns(Patterns),
+   replace_all_vins(Patterns,Lmots,L_mots_unif).
+
+vin_patterns(Patterns) :-
+   findall((Tokens,Id), vin_tokens(Id,Tokens), AllPairs),
+   sort_vin_patterns(AllPairs,Patterns).
+
+sort_vin_patterns(Pairs,Sorted) :-
+   maplist(add_length_key,Pairs,Keyed),
+   keysort(Keyed,KeyedSorted),
+   maplist(remove_length_key,KeyedSorted,Sorted).
+
+add_length_key((Tokens,Id),LenNeg-(Tokens,Id)) :-
+   length(Tokens,Len),
+   LenNeg is -Len.
+
+remove_length_key(_Key-(Tokens,Id),(Tokens,Id)).
+
+vin_tokens(Id,Tokens) :-
+   nom(Id,Label),
+   label_tokens(Label,Tokens).
+vin_tokens(Id,Stem) :-
+   nom(Id,Label),
+   label_tokens(Label,Tokens),
+   append(Stem,[Last],Tokens),
+   atom_number(Last,_),
+   Stem \= [].
+
+label_tokens(Label,TokensAtoms) :-
+   downcase_atom(Label,Lower),
+   atom_string(Lower,LowerStr),
+   split_string(LowerStr," '-.,()/", " '-.,()/",Tokens0),
+   exclude(=(""),Tokens0,TokensStrings),
+   maplist(atom_string,TokensAtoms,TokensStrings).
+
+replace_all_vins([],L,L).
+replace_all_vins([(Tokens,Id)|Rest],LIn,LOut) :-
+   replace_vin(Tokens,Id,LIn,LTemp),
+   replace_all_vins(Rest,LTemp,LOut).
 
 replace_vin(L,X,In,Out) :-
    append(L,Suf,In), !, Out = [X|Suf].
