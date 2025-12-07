@@ -1,256 +1,348 @@
-## 1. Stack technique proposée
+## Phase 0 – Mise au propre du squelette
 
-### 1.1. Langage & runtime
+🎯 Objectif : avoir une base stable avant d’ajouter de l’intelligence.
 
-* **Langage** : Prolog (SWI-Prolog, comme prévu par le squelette).
-* **Interpréteur** :
+1. Vérifier que :
 
-  * Installer **SWI-Prolog** (swipl).
-  * Commande de base pour lancer le bot :
+   * le squelette `grandgousier` se compile sans erreur ;
+   * le module `base_vins` est bien chargé ;
+   * la boucle principale affiche la phrase d’accueil de l’énoncé, lit une question, affiche la réponse par défaut, et s’arrête sur « fin ».
 
-    ```bash
-    swipl -s grandgousier.pl
-    ```
-  * Éventuellement un petit script `run.sh` ou `run.bat` pour faciliter les tests.
+2. Test manuel :
 
-### 1.2. IDE / éditeur (JetBrains)
-
-Tu as une licence JetBrains, donc :
-
-* **IDE principal** : **IntelliJ IDEA** (Community ou Ultimate).
-* **Pour Prolog** :
-
-  * Utiliser un **plugin Prolog** (pour la coloration, indentation, etc.) si vous en trouvez un compatible.
-  * Sinon, IntelliJ reste très bien pour l’édition (git intégré, search, etc.), et vous lancez SWI-Prolog dans un terminal à côté.
-* Organisation suggérée des fichiers :
-
-  * `src/grandgousier.pl` (code final)
-  * `src/grandgousier-elm.pl` (référence / brouillon)
-  * `src/eliza.pl` (si besoin pour s’inspirer)
-  * `data/grafe-lecocq.tex` (texte des vins)
-  * `doc/` pour le rapport
-
-### 1.3. Gestion de versions / collaboration
-
-* **Git + GitHub** :
-
-  * Un seul repo, par ex. `unamur-grandgousier-2025`.
-  * Branch principale : `main`.
-  * Branches de travail : `feature/…`, par ex. `feature/moteur-regles`, `feature/base-vins`, etc.
-
-Fichiers utiles :
-
-* `.gitignore` :
-
-  * Ignorer : fichiers temporaires, `.swp`, `.DS_Store`, éventuellement build/log si vous en générez.
-* `README.md` :
-
-  * Comment lancer le programme.
-  * Version de SWI-Prolog testée.
-  * Auteurs.
-
-### 1.4. Documentation / rapport
-
-* Vu la présence de `grafe-lecocq.tex`, **LaTeX** est naturel pour le rapport :
-
-  * `doc/rapport.tex`
-  * Compilation via latexmk ou Overleaf (à vous de voir).
-* Si vous préférez simple : **Markdown** + export PDF.
-  Mais je parierais que le prof aime bien LaTeX 😄
+   * Lancer `grandgousier` depuis Prolog.
+   * Poser une question quelconque → réponse par défaut « je ne sais pas… ».
+   * Taper « fin » → message d’au revoir et arrêt du programme.
 
 ---
 
-## 2. Organisation à deux sur GitHub
+## Phase 1 – Base de connaissances sur les vins
 
-### 2.1. Rôles (mais vous tournez régulièrement)
+🎯 Objectif : garantir que tous les vins nécessaires aux dialogues sont correctement décrits.
 
-* **Personne A – “moteur & règles”**
+1. **Lister les vins impliqués dans les dialogues** à partir de l’énoncé :
 
-  * Comprendre en détail `produire_reponse/2`, `mclef/2`, `regle_rep/4`.
-  * Implémenter les règles de dialogue (patterns, conditions).
-* **Personne B – “base de connaissances & rapport”**
+   * Côté Bourgogne : Coteaux Bourguignons 2014, Bourgogne Pinot Noir (les Marnes), Hautes Côtes de Nuits 2014, Nuits-Saint-Georges 1er cru 2013 « Les Chaboeufs », Chambolle-Musigny 1er cru 2012 Les Noirots…
+   * Côté prix 20–35€ : La Fleur de Pomys 2012, Hermitage rouge 2007…
+   * Côté canard : Graves, St-Émilion, Pomerol, Marsannay, Fixin, Nuits St Georges, Gevrey-Chambertin, Côte Rôtie, St Joseph, Hermitage…
+   * Côté appellation : Haut-Médoc.
 
-  * Extraire les infos de `grafe-lecocq.tex`.
-  * Construire les faits Prolog : `nom/2`, `prix/2`, `nez/2`, `bouche/2`, `description/2`, `appellation/2`, etc.
-  * Documenter les choix dans le rapport.
+2. Pour chaque vin concerné, vérifier/compléter dans la base :
 
-Mais **chacun relit le code de l’autre** via des pull requests.
+   * un identifiant interne (par ex. `la_fleur_de_pomys_2012`) associé à son nom lisible ;
+   * un prix cohérent avec l’énoncé (7,99 ; 11,92 ; 15,16 ; 42,35 ; 63,85 ; 21,36 ; 33,98 ; 9,46, etc.) ;
+   * un texte « au nez » et « en bouche » pour les vins mentionnés dans les questions nez/bouche ;
+   * un texte de description pour La Fleur de Pomys (texte long extrait de Grafé-Lecocq / projet).
 
-### 2.2. Workflow Git simple
+3. Préparer (au moins pour les besoins du projet) une mini-taxonomie :
 
-1. Un de vous crée le repo sur GitHub et pousse le squelette `grandgousier.pl`.
-2. Pour chaque évolution :
+   * provenance (Bordeaux, Bourgogne, Rhône Nord, etc.) ;
+   * appellation (Haut-Médoc, Graves, Saint-Émilion, etc.), même si tu ne l’utilises pas immédiatement.
 
-   * `git checkout -b feature/mclef`
-   * coder / tester
-   * `git commit` + `git push`
-   * ouvrir une Pull Request, l’autre relit.
-3. Merge dans `main` seulement quand ça tourne (tests manuels de quelques dialogues).
+4. Tests internes (Prolog interactif) :
 
----
-
-## 3. Roadmap du projet
-
-Je te fais une roadmap **progressive**, en suivant aussi le conseil de l’énoncé (“du plus simple au plus complexe”).
-
-### Étape 0 — Mise en place (très rapide)
-
-* Créer le repo GitHub et y mettre :
-
-  * `grandgousier.pl` (squelette fourni)
-  * `projet.pdf`, `grafe-lecocq.tex` dans `data/` ou `doc/`
-* Vérifier que :
-
-  * `swipl -s grandgousier.pl` lance bien le bot.
-  * Une question triviale donne la réponse par défaut (“je ne sais pas”).
+   * Interroger la base pour chaque vin : nom, prix, nez, bouche, description.
+   * Vérifier que les textes sont des listes de listes de mots, prêts à être affichés.
 
 ---
 
-### Étape 1 — Compréhension & mini-tests
+## Phase 2 – Normalisation des noms de vins dans les questions
 
-* Lire attentivement :
+🎯 Objectif : faire le pont entre ce que tape l’utilisateur (« nuits saint georges ») et tes identifiants internes (`les_chaboeufs_2013`, etc.).
 
-  * Le fonctionnement de `read_atomics/1` et `ecrire_reponse/1`.
-  * Le code fourni dans le squelette (notamment les exemples de `bouche/2`, `nez/2`, `mclef/2`, `regle_rep/4`).
-* Faire de **petits tests** :
+1. Identifier les formes textuelles que l’utilisateur va taper :
 
-  * Tester une règle déjà codée (par ex. la règle sur `bouche` ou les prix min/max).
-  * Comprendre comment `match_pattern/2` et `nom_vins_uniforme/2` fonctionnent.
+   * Nuits-Saint-Georges / nuits saint georges / avec ou sans année ;
+   * Chambolle-Musigny / chambolle musigny / avec ou sans année ;
+   * La Fleur de Pomys / la fleur de pomys / avec ou sans année ;
+   * éventuellement Beaumes-de-Venise (déjà commencé) et autres vins si utile.
 
-Objectif : être à l’aise avec le fait que **tout se fait via des listes de mots en minuscules**.
+2. Concevoir une **normalisation des noms** :
 
----
+   * définir quelles séquences de mots doivent être reconnues pour chaque vin ;
+   * prévoir les variantes minimales utiles (avec ou sans millésime).
 
-### Étape 2 — Première version “minimale” des dialogues simples
+3. Adapter le prédicat de normalisation (celui qui transforme la liste de mots de la question en liste “uniformisée”) pour :
 
-Cibler d’abord les **4 questions “simples”** de l’énoncé :
+   * remplacer les séquences `[nuits, saint, georges, …]` par l’identifiant du Nuits-Saint-Georges ;
+   * remplacer `[chambolle, musigny, …]` par l’identifiant du Chambolle ;
+   * remplacer `[la, fleur, de, pomys, …]` par l’identifiant de La Fleur de Pomys ;
+   * conserver les autres mots inchangés.
 
-1. “Quels vins de Bourgogne me conseillez-vous ?”
-2. “Que donne le Nuits-Saint-Georges en bouche ?”
-3. “Quel nez présente le Chambolle-Musigny ?”
-4. “Que recouvre l’appellation Haut-Médoc ?”
+4. Tests « moteur de normalisation » :
 
-Sous-tâches :
-
-* Définir quelques vins dans la base Prolog :
-
-  * `nom(Id, 'Appellation complète').`
-  * `prix(Id, Prix).`
-  * `nez(Id, Texte).`
-  * `bouche(Id, Texte).`
-  * `description(Id, Texte).`
-  * `appellation(Id, RegionOuTexte).`
-* Créer des premières règles `mclef/2` (par ex. `mclef(bourgogne, 10).`, `mclef(appellation, 10).`, etc.).
-* Pour chaque type de question, une règle `regle_rep/4` avec un **pattern réaliste** (liste de mots minuscules, sans ponctuation) et une réponse en liste de listes.
-
-Objectif : **reproduire ces 4 dialogues** (à quelques détails près) en restant propre.
+   * Simuler des listes de mots (issues de `read_atomics`) et vérifier que la normalisation renvoie bien la liste avec l’identifiant du vin au bon endroit.
+   * Vérifier plusieurs variantes (avec et sans année, ordre des mots, etc.).
 
 ---
 
-### Étape 3 — Gestion des “autres vins de Bourgogne” & prix
+## Phase 3 – Questions directes sur un vin (nez, bouche, description)
 
-On passe aux dialogues plus avancés :
+🎯 Objectif : faire fonctionner les trois questions « simples » recommandées dans l’énoncé :
 
-1. “Auriez-vous d’autres vins de Bourgogne ?”
-2. “Auriez-vous des vins entre 20 et 35 EUR ?”
+* Que donne le Nuits-Saint-Georges en bouche ?
+* Quel nez présente le Chambolle-Musigny ?
+* Pourriez-vous m’en dire plus sur La Fleur de Pomys ?
 
-Sous-tâches :
+1. Choisir une stratégie de reconnaissance :
 
-* Concevoir une stratégie pour “autres vins de Bourgogne” :
+   * identifier les mots-clés : “bouche”, “nez”, “pourriezvous” (ou équivalent) ;
+   * associer à chaque mot-clé un niveau d’importance (mclef) ;
+   * définir pour chaque mot-clé un ou plusieurs patterns (listes de mots) correspondant aux formulations autorisées des questions.
 
-  * Garder en mémoire les vins déjà proposés ? (via un prédicat dynamique ou un choix simple : séparer première recommandation et “autres” via des listes différentes).
-* Utiliser / adapter les prédicats déjà présents pour les **prix min/max** (il y a déjà des éléments dans le squelette) :
+2. Pour chaque type de question :
 
-  * `prix_vin_min_max/4`, `lvins_prix_min_max/3`, `rep_lvins_min_max/2`, etc.
-* Ajouter les `regle_rep/4` correspondantes :
+   * définir un pattern sur la liste de mots (incluant un « trou » pour le vin) ;
+   * définir la manière d’extraire l’identifiant du vin (grâce à la normalisation faite à la phase 2) ;
+   * définir la construction de la réponse à partir des prédicats `nez`, `bouche`, `description` (réutiliser leur texte tel quel, sans le reformatter manuellement).
 
-  * Pattern pour la question “auriezvous des vins entre X et Y eur” (comme dans le squelette).
-  * Un ou deux patterns pour “autres vins de bourgogne”.
+3. Tests « dialogue » :
 
-Objectif : les deux questions sur les **autres vins** et les **tranches de prix** doivent fonctionner.
+   * Lancer `grandgousier` et poser :
 
----
-
-### Étape 4 — Description détaillée d’un vin & liens avec les textes
-
-Dialogue :
-“Pourriez-vous m’en dire plus sur La Fleur de Pomys ?”
-
-Sous-tâches :
-
-* Récupérer dans `grafe-lecocq.tex` la **description** textuelle de ce vin, et la transformer en :
-
-  * `description(id_fleur_de_pomys_2012, [[...],[...],...]).`
-* Ajouter une **règle** `regle_rep(description, …)` ou similaire :
-
-  * Pattern incluant le nom du vin normalisé (via `nom_vins_uniforme/2` si nécessaire).
-  * La réponse se base sur `description/2`.
-
-Objectif : question sur “en dire plus” → affichage de la description structurée en lignes.
+     * « que donne le nuits saint georges en bouche ? »
+     * « quel nez presente le chambolle musigny ? »
+     * « pourriezvous men dire plus sur la fleur de pomys ? »
+   * Vérifier que les textes retournés correspondent bien à la base (impression en bouche, nez, description détaillée).
 
 ---
 
-### Étape 5 — Recommandation par plat (canard)
+## Phase 4 – Requêtes par prix (entre 20 et 35 EUR)
 
-Dialogue :
-“Pour Noël, j’envisage de cuisiner du canard. Quel vin me conseillez-vous ?”
+🎯 Objectif : répondre à « Auriez-vous des vins entre 20 et 35 EUR ? » en proposant la bonne sélection (La Fleur de Pomys 2012, Hermitage rouge 2007, etc.).
 
-Sous-tâches :
+1. Définir le rôle du mot-clé “vins” ou d’un autre mot-clé spécifique aux requêtes de prix.
 
-* Créer un petit **module de règles d’association plats–profils de vin** :
+2. Concevoir la logique :
 
-  * par ex. `profil(canard, rouge_puissant_epice_fume).`
-  * et des associations de profils à régions / appellations.
-* Concevoir `regle_rep(plat, …)` qui :
+   * extraire les deux bornes numériques X et Y de la question ;
+   * parcourir la base de vins pour trouver tous ceux dont le prix P satisfait X ≤ P ≤ Y ;
+   * ordonner éventuellement la liste (par prix croissant, par exemple).
 
-  * détecte `noel` / `canard` / `viande` dans la question.
-  * renvoie un texte du type de celui de l’énoncé.
+3. Définir un format de réponse textuelle :
 
-Objectif : donner au moins les familles de vins proposées (Haut-Médoc, Graves, etc.).
+   * phrase d’introduction (« Oui, je vous conseille… ») ;
+   * une ligne par vin, avec son nom, éventuellement un court commentaire (« un vin dense et racé »), et le prix (en EUR) ;
 
----
+4. Tests :
 
-### Étape 6 — Robustesse, variantes & petits plus
-
-* Gérer quelques **variantes linguistiques** :
-
-  * “quels vins de bourgogne pouvez vous me conseiller”
-  * “je cherche des vins de bourgogne”
-* Ajouter des **règles par défaut** un peu plus fines que le simple “je ne sais pas”.
-* Enrichir la base de vins si vous avez encore du temps (toujours à partir des textes fournis, pas d’invention).
+   * poser exactement la question de l’énoncé ;
+   * vérifier que la liste contient au moins La Fleur de Pomys 2012 et Hermitage rouge 2007, avec les bons prix et éventuels commentaires.
 
 ---
 
-### Étape 7 — Rapport
+## Phase 5 – Conseils par région : Bourgogne (vins principaux + autres)
 
-Structure possible :
+🎯 Objectif : reproduire les deux premières répliques de l’énoncé sur la Bourgogne :
+
+* « Quels vins de Bourgogne me conseillez-vous ? »
+* « Auriez-vous d’autres vins de Bourgogne ? »
+
+1. Construire une mini-base de recommandations pour la **Bourgogne** :
+
+   * liste de « premiers conseils » (Coteaux Bourguignons 2014, Bourgogne Pinot Noir les Marnes, Hautes Côtes de Nuits 2014) avec, pour chaque, un petit commentaire (plaisant, polyvalent, grande personnalité…) et le prix ;
+   * liste de « vins supplémentaires » (Nuits-Saint-Georges Chaboeufs, Chambolle-Musigny Noirots) avec leur commentaire et prix.
+
+2. Définir les mots-clés :
+
+   * un mot-clé lié à la région “bourgogne” ;
+   * éventuellement un mot-clé distinct pour la question « d’autres vins ».
+
+3. Concevoir les patterns :
+
+   * pattern pour « Quels vins de Bourgogne me conseillez-vous ? » (premier conseil) ;
+   * pattern pour « Auriez-vous d’autres vins de Bourgogne ? » (liste supplémentaire).
+
+4. Prévoir des prédicats auxiliaires pour :
+
+   * transformer les listes de vins recommandés en listes de phrases structurées (nom + commentaire + prix) ;
+   * factoriser si possible, pour réutiliser la même logique avec d’autres régions plus tard (optionnel mais propre).
+
+5. Tests :
+
+   * poser les deux questions consécutivement et vérifier que la deuxième réponse **ne répète pas** ceux du premier conseil, mais donne bien les vins supplémentaires attendus.
+
+---
+
+## Phase 6 – Association vin / plat : le canard
+
+🎯 Objectif : gérer la question :
+« Pour Noël, j’envisage de cuisiner du canard. Quel vin me conseillez-vous ? »
+
+1. Définir une structure de connaissances pour l’accord mets/vins :
+
+   * associer le plat “canard” à une description globale du style de vin (rouge puissant, épicé, fumé, fin de bouche tannique, etc.) ;
+   * associer le plat “canard” à une liste d’appellations recommandées, réparties par région (Bordeaux, Bourgogne, Rhône Nord) comme dans l’énoncé.
+
+2. Définir un mot-clé lié au plat (par exemple “canard”) et/ou un mot-clé plus général (mets, plat).
+
+3. Concevoir le pattern :
+
+   * formulation ciblant la phrase de l’énoncé (éventuellement avec quelques variantes possibles : “je cuisine du canard”, “je vais préparer du canard”…).
+
+4. Définir la réponse attendue :
+
+   * phrase générale décrivant le style de vin ;
+   * ensuite la liste d’appellations regroupées par région, exactement dans l’esprit de l’énoncé (Bordeaux : …, Bourgogne : …, Rhône Nord : …).
+
+5. Tests :
+
+   * poser la question de l’énoncé ;
+   * vérifier que la réponse contient la description générale + les appellations dans les bons groupes.
+
+---
+
+## Phase 7 – Choix d’un vin précis à partir d’une appellation (ex. Graves)
+
+🎯 Objectif : gérer « Vous auriez un Graves ? » et proposer le Ch. Menota Cuvée Montagrede 2014 avec son prix.
+
+1. Introduire une classification appellation → vins :
+
+   * associer l’appellation Graves à un ou plusieurs vins de la base (au minimum Ch. Menota 2014).
+
+2. Définir un mot-clé pour cette appellation (ou réutiliser la structure appellation construite plus tôt).
+
+3. Concevoir la logique :
+
+   * lorsqu’on détecte “Graves” dans la question, rechercher un vin correspondant à cette appellation dans la base ;
+   * choisir un vin « recommandé » (dans ce cas précis, Ch. Menota 2014).
+
+4. Formater la réponse :
+
+   * phrase courte : « Oui, je vous conseille … » ;
+   * nom du vin, millésime, prix, texte entre parenthèses comme dans l’énoncé.
+
+5. Tests :
+
+   * poser « vous auriez un graves ? » ;
+   * vérifier que la réponse mentionne bien le vin et son prix exact.
+
+---
+
+## Phase 8 – Explication d’une appellation (Haut-Médoc)
+
+🎯 Objectif : gérer la question explicative :
+« Que recouvre l’appellation Haut-Médoc ? »
+
+1. Créer une mini-base descriptive des appellations importantes :
+
+   * au minimum une entrée pour `haut_medoc` contenant le texte explicatif de l’énoncé (vignoble du Médoc, moitié sud, appellation régionale, communes enclavées, etc.).
+
+2. Définir les mots-clés :
+
+   * “appellation” ;
+   * éventuellement chaque nom d’appellation (hauts-medoc, graves…) si nécessaire.
+
+3. Concevoir le pattern pour la question :
+
+   * quelque chose du type « que recouvre l’appellation X ? ».
+
+4. Définir la logique :
+
+   * extraire le nom de l’appellation dans la question ;
+   * le normaliser vers l’identifiant interne (`haut_medoc`) ;
+   * sélectionner la description correspondante dans la base et la retourner.
+
+5. Tests :
+
+   * poser « que recouvre lappellation haut medoc ? » ;
+   * vérifier que la réponse reprend bien l’explication complète (aire, subdivision, communes, etc.).
+
+---
+
+## Phase 9 – Moteur de règles / mots-clés plus robuste
+
+🎯 Objectif : améliorer la stratégie générale pour qu’elle colle à ce que demande l’énoncé : sélection du meilleur mot-clé selon son importance, puis test des patterns associés.
+
+1. Mettre en place la construction d’une **liste de mots-clés détectés** dans la question :
+
+   * parcourir les mots de la question ;
+   * pour chaque mot qui est un mot-clé connu, récupérer son importance.
+
+2. Ordonner cette liste par importance décroissante.
+
+3. Pour chaque mot-clé (dans cet ordre) :
+
+   * tester, un par un, les patterns associés à ce mot-clé ;
+   * vérifier les éventuelles conditions supplémentaires (prix, région, etc.) ;
+   * dès qu’un pattern et ses conditions réussissent, retourner la réponse correspondante.
+
+4. Gérer le cas « je ne sais pas » :
+
+   * si aucun mot-clé pertinent n’est trouvé ou si aucun pattern ne matche, tomber sur la réponse par défaut.
+
+5. Tests globaux :
+
+   * rejouer tous les dialogues de l’énoncé d’une traite et vérifier que le bon mot-clé est utilisé à chaque fois, sans interférence (ex. la question sur les prix ne doit pas être prise pour une question sur la région).
+
+---
+
+## Phase 10 – Variantes de formulations & robustesse
+
+🎯 Objectif : rendre le bot moins fragile sans exploser la complexité.
+
+1. Pour chaque type de question déjà géré :
+
+   * imaginer 2 ou 3 formulations naturelles proches (par ex. inversion du sujet, ajout de “s’il vous plaît”, etc.) ;
+   * décider lesquelles tu veux supporter réellement (en restant raisonnable).
+
+2. Pour ces nouvelles formulations :
+
+   * ajouter des patterns supplémentaires pour les mêmes mots-clés ;
+   * privilégier des patterns sobres, centrés sur les mots porteurs de sens (bourgogne, vins, bouche, nez, canard, etc.).
+
+3. Tests :
+
+   * poser ces variantes et vérifier que le même traitement est appliqué.
+
+---
+
+## Phase 11 – Rapport écrit
+
+🎯 Objectif : produire un rapport qui montre que tu maîtrises le projet et tes choix techniques.
+
+Plan possible :
 
 1. **Introduction**
 
-   * Description du problème (bot conseiller en vins).
-   * Contexte du projet.
-2. **Stack & outils**
+   * objectif du projet ;
+   * rôle de Grandgousier (conseil en vins, informations, etc.).
 
-   * SWI-Prolog, organisation du code, organisation GitHub.
-3. **Architecture du programme**
+2. **Architecture générale**
 
-   * Rôle de `read_atomics/1`, `produire_reponse/2`, `ecrire_reponse/1`, boucle `grandgousier/0`.
-4. **Représentation des connaissances**
+   * transformation des questions en listes de mots (lecture, nettoyage) ;
+   * transformation inverse pour les réponses (écriture formatée) ;
+   * boucle principale de dialogue.
 
-   * Faits `nom/2`, `prix/2`, `nez/2`, `bouche/2`, `description/2`, `appellation/2`, etc.
-5. **Moteur de règles**
+3. **Représentation des connaissances**
 
-   * `mclef/2`, `regle_rep/4`, patterns, prédicats auxiliaires (`match_pattern`, etc.).
-6. **Exemples de dialogues**
+   * structure des faits sur les vins : identifiants, noms, prix, nez, bouche, description ;
+   * classification par région, appellation, type de plat.
 
-   * Capture d’écran ou transcript de dialogues correspondant à ceux de l’énoncé + autres imaginés.
-7. **Limites & améliorations possibles**
+4. **Stratégie de traitement des questions**
 
-   * Ce que vous n’avez pas eu le temps de faire, pistes d’extension.
+   * notion de mot-clé et d’importance ;
+   * structure des règles (mot-clé, numéro de pattern, pattern, réponse, conditions) ;
+   * stratégie de sélection d’une règle (tri des mots-clés, test successif des patterns).
+
+5. **Détails de réalisation des dialogues demandés**
+
+   * conseils pour les vins de Bourgogne (premiers et autres) ;
+   * sélection de vins par prix ;
+   * questions directes nez/bouche/description ;
+   * associations vin/plat (canard) ;
+   * explication d’appellation (Haut-Médoc).
+
+6. **Exemples de dialogues commentés**
+
+   * reproduire le dialogue complet de l’énoncé ;
+   * expliquer, pour quelques questions, quelle règle et quelles connaissances ont été utilisées.
+
+7. **Conclusion**
+
+   * limites du prototype ;
+   * pistes d’amélioration (autres mets, autres régions, analyse grammaticale plus fine, etc.).
 
 ---
 
-Si tu veux, à la prochaine étape on peut :
-
-* détailler l’architecture du repo (fichiers précis), **ou**
-* commencer directement par définir les premiers `mclef/2` et `regle_rep/4` nécessaires pour “Quels vins de Bourgogne me conseillez-vous ?”.
+Si tu veux, on peut maintenant prendre **une phase précise** (par exemple Phase 3 ou 5) et je te détaille quelles questions poser exactement à Codex pour qu’il implémente ce bloc de fonctionnalités en une fois.
