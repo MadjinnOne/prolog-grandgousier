@@ -83,9 +83,8 @@ sort_vin_patterns(Pairs,Sorted) :-
    keysort(Keyed,KeyedSorted),
    maplist(remove_length_key,KeyedSorted,Sorted).
 
-add_length_key((Tokens,Id),LenNeg-(Tokens,Id)) :-
-   length(Tokens,Len),
-   LenNeg is -Len.
+add_length_key((Tokens,Id),(-Len,(Tokens,Id))) :-
+   length(Tokens,Len).
 
 remove_length_key(_Key-(Tokens,Id),(Tokens,Id)).
 
