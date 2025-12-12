@@ -1,5 +1,6 @@
 :- module(base_vins, [
-    nom/2, prix/2, nez/2, bouche/2, description/2]).
+    nom/2, prix/2, nez/2, bouche/2, description/2,
+    provenance/2, appellation/2]).
 
 % -------- Base de connaissances sur les vins -------- %
 
@@ -137,6 +138,141 @@ prix(cognac_trois_etoiles, 20.87).
 prix(cognac_fine_champagne_vsop, 22.26).
 prix(cognac_grande_champagne_hors_age, 32.28).
 
+% Provenance (grande region) et appellation pour l'ensemble des vins.
+
+provenance(beaumes_de_venise_2015, rhone_sud).
+provenance(les_chaboeufs_2013, bourgogne).
+provenance(ch_moulin_de_mallet_2014, bordeaux).
+provenance(ch_la_fleur_baudron_2014, bordeaux).
+provenance(ch_bois_vert_elegance_2014, bordeaux).
+provenance(ch_menota_cuvee_montagrede_2014, bordeaux).
+provenance(syrah_2015_vin_de_pays_doc, languedoc).
+provenance(coteaux_bourguignons_2014, bourgogne).
+provenance(champagne_brut_reserve, champagne).
+provenance(ch_paret_2012, bordeaux).
+provenance(madiran_vieilles_vignes_2006, sud_ouest).
+provenance(ch_du_moulin_neuf_prestige_2014, bordeaux).
+provenance(ch_milon_la_grave_particuliere_2012, bordeaux).
+provenance(ch_roc_de_binet_2010, bordeaux).
+provenance(ch_ruat_petit_poujeaux_2010, bordeaux).
+provenance(ch_les_polyanthas_2010, bordeaux).
+provenance(ch_la_menotte_2012, bordeaux).
+provenance(la_fleur_de_pomys_2012, bordeaux).
+provenance(pauillac_2011, bordeaux).
+provenance(florilege_saint_julien_2010, bordeaux).
+provenance(florilege_pomerol_2012, bordeaux).
+provenance(cotes_du_rhone_villages_pierre_charlotte_2014, rhone_sud).
+provenance(tautavel_2014, roussillon).
+provenance(lirac_2015, rhone_sud).
+provenance(cairanne_2014, rhone_sud).
+provenance(vacqueyras_2014, rhone_sud).
+provenance(saint_joseph_2014, rhone_nord).
+provenance(gigondas_2014, rhone_sud).
+provenance(chateauneuf_du_pape_rouge_2013, rhone_sud).
+provenance(hermitage_rouge_2007, rhone_nord).
+provenance(bourgogne_pinot_noir_les_marnes_2014, bourgogne).
+provenance(hautes_cotes_de_nuits_2014, bourgogne).
+provenance(savigny_les_beaune_2014, bourgogne).
+provenance(savigny_les_beaune_premier_cru_2014, bourgogne).
+provenance(aloxe_corton_2014, bourgogne).
+provenance(chambolle_musigny_premier_cru_2012, bourgogne).
+provenance(chiroubles_2013, beaujolais).
+provenance(fleurie_2015, beaujolais).
+provenance(moulin_a_vent_2014, beaujolais).
+provenance(chinon_vieilles_vignes_2014, val_de_loire).
+provenance(sancerre_rouge_2015, val_de_loire).
+provenance(les_guignards_2015, sud_ouest).
+provenance(chardonnay_exception_2016, languedoc).
+provenance(cotes_du_rhone_blanc_pierre_charlotte_2016, rhone_sud).
+provenance(ch_le_druc_2015, bordeaux).
+provenance(laudun_2016, rhone_sud).
+provenance(vouvray_blanc_sec_2016, val_de_loire).
+provenance(macon_villages_2015, bourgogne).
+provenance(pinot_gris_2015, alsace).
+provenance(gewurztraminer_2015, alsace).
+provenance(vire_clesse_2016, bourgogne).
+provenance(sancerre_blanc_verdigny_2015, val_de_loire).
+provenance(vacqueyras_blanc_2016, rhone_sud).
+provenance(hautes_cotes_de_beaune_2015, bourgogne).
+provenance(pouilly_fuisse_2014, bourgogne).
+provenance(chablis_premier_cru_montmains_2014, bourgogne).
+provenance(condrieu_2015, rhone_nord).
+provenance(cremant_de_loire_brut, val_de_loire).
+provenance(champagne_extra_brut, champagne).
+provenance(champagne_brut_oeil_de_perdrix, champagne).
+provenance(champagne_brut_rose_de_saignee, champagne).
+provenance(champagne_brut_or_blanc, champagne).
+provenance(champagne_brut_prestige, champagne).
+provenance(cognac_trois_etoiles, cognac).
+provenance(cognac_fine_champagne_vsop, cognac).
+provenance(cognac_grande_champagne_hors_age, cognac).
+
+appellation(beaumes_de_venise_2015, beaumes_de_venise).
+appellation(les_chaboeufs_2013, nuits_saint_georges).
+appellation(ch_moulin_de_mallet_2014, bordeaux).
+appellation(ch_la_fleur_baudron_2014, bordeaux_superieur).
+appellation(ch_bois_vert_elegance_2014, cotes_de_bordeaux_blaye).
+appellation(ch_menota_cuvee_montagrede_2014, graves).
+appellation(syrah_2015_vin_de_pays_doc, vin_de_pays_d_oc).
+appellation(coteaux_bourguignons_2014, coteaux_bourguignons).
+appellation(champagne_brut_reserve, champagne).
+appellation(ch_paret_2012, cotes_de_bordeaux_castillon).
+appellation(madiran_vieilles_vignes_2006, madiran).
+appellation(ch_du_moulin_neuf_prestige_2014, medoc).
+appellation(ch_milon_la_grave_particuliere_2012, lussac_saint_emilion).
+appellation(ch_roc_de_binet_2010, montagne_saint_emilion).
+appellation(ch_ruat_petit_poujeaux_2010, moulis_en_medoc).
+appellation(ch_les_polyanthas_2010, saint_emilion).
+appellation(ch_la_menotte_2012, lalande_de_pomerol).
+appellation(la_fleur_de_pomys_2012, saint_estephe).
+appellation(pauillac_2011, pauillac).
+appellation(florilege_saint_julien_2010, saint_julien).
+appellation(florilege_pomerol_2012, pomerol).
+appellation(cotes_du_rhone_villages_pierre_charlotte_2014, cotes_du_rhone_villages).
+appellation(tautavel_2014, cotes_du_roussillon_villages_tautavel).
+appellation(lirac_2015, lirac).
+appellation(cairanne_2014, cairanne).
+appellation(vacqueyras_2014, vacqueyras).
+appellation(saint_joseph_2014, saint_joseph).
+appellation(gigondas_2014, gigondas).
+appellation(chateauneuf_du_pape_rouge_2013, chateauneuf_du_pape).
+appellation(hermitage_rouge_2007, hermitage).
+appellation(bourgogne_pinot_noir_les_marnes_2014, bourgogne_pinot_noir).
+appellation(hautes_cotes_de_nuits_2014, hautes_cotes_de_nuits).
+appellation(savigny_les_beaune_2014, savigny_les_beaune).
+appellation(savigny_les_beaune_premier_cru_2014, savigny_les_beaune_premier_cru).
+appellation(aloxe_corton_2014, aloxe_corton).
+appellation(chambolle_musigny_premier_cru_2012, chambolle_musigny).
+appellation(chiroubles_2013, chiroubles).
+appellation(fleurie_2015, fleurie).
+appellation(moulin_a_vent_2014, moulin_a_vent).
+appellation(chinon_vieilles_vignes_2014, chinon).
+appellation(sancerre_rouge_2015, sancerre).
+appellation(les_guignards_2015, cotes_de_duras).
+appellation(chardonnay_exception_2016, vin_de_pays_d_oc).
+appellation(cotes_du_rhone_blanc_pierre_charlotte_2016, cotes_du_rhone).
+appellation(ch_le_druc_2015, graves).
+appellation(laudun_2016, cotes_du_rhone_villages_laudun).
+appellation(vouvray_blanc_sec_2016, vouvray).
+appellation(macon_villages_2015, macon_villages).
+appellation(pinot_gris_2015, pinot_gris).
+appellation(gewurztraminer_2015, gewurztraminer).
+appellation(vire_clesse_2016, vire_clesse).
+appellation(sancerre_blanc_verdigny_2015, sancerre).
+appellation(vacqueyras_blanc_2016, vacqueyras).
+appellation(hautes_cotes_de_beaune_2015, hautes_cotes_de_beaune).
+appellation(pouilly_fuisse_2014, pouilly_fuisse).
+appellation(chablis_premier_cru_montmains_2014, chablis_premier_cru_montmains).
+appellation(condrieu_2015, condrieu).
+appellation(cremant_de_loire_brut, cremant_de_loire).
+appellation(champagne_extra_brut, champagne).
+appellation(champagne_brut_oeil_de_perdrix, champagne).
+appellation(champagne_brut_rose_de_saignee, champagne).
+appellation(champagne_brut_or_blanc, champagne).
+appellation(champagne_brut_prestige, champagne).
+appellation(cognac_trois_etoiles, cognac).
+appellation(cognac_fine_champagne_vsop, fine_champagne).
+appellation(cognac_grande_champagne_hors_age, grande_champagne).
 nez(beaumes_de_venise_2015,
   [ [ nez, intensement, parfume, '.' ]
 ]).

@@ -4,4 +4,4 @@
 cd "$(dirname "$0")/.."
 
 # Lancer SWI-Prolog avec le fichier principal
-swipl -q -s grandgousier.pl
+swipl -q -s grandgousier.pl -g grandgousier -t halt

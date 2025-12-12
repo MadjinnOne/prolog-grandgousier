@@ -1,4 +1,5 @@
 :- use_module(library(lists)).
+:- use_module(library(pairs)).
 :- use_module(base_vins).      % <--- on charge la base de connaissances
 /* --------------------------------------------------------------------- */
 /*                                                                       */
@@ -71,21 +72,57 @@ prefixrem([],L,L).
 prefixrem([H|T],[H|L],Lr) :- prefixrem(T,L,Lr).
 
 nom_vins_uniforme(Lmots,L_mots_unif) :-
-   L1 = Lmots,
-   replace_vin([beaumes,de,venise,2015],beaumes_de_venise_2015,L1,L2),
-   replace_vin([beaumes,de,venise],beaumes_de_venise_2015,L2,L3),
+   normalisation_variants(Variants),
+   remplace_variants(Variants,Lmots,L_mots_unif).
 
-   replace_vin([nuits,saint,georges,2013],les_chaboeufs_2013,L3,L4),
-   replace_vin([nuits,saint,georges,premier,cru,2013],les_chaboeufs_2013,L4,L5),
-   replace_vin([les,chaboeufs,2013],les_chaboeufs_2013,L5,L6),
-   replace_vin([nuits,saint,georges],les_chaboeufs_2013,L6,L7),
+normalisation_variants(Variants) :-
+   findall(Key-variant(Vin,Pattern),
+      ( vin_synonyme(Vin,Pattern),
+        length(Pattern,Len),
+        Key is -Len
+      ),
+      Raw),
+   keysort(Raw,Sorted),
+   pairs_values(Sorted,Variants).
 
-   replace_vin([chambolle,musigny,premier,cru,2012],chambolle_musigny_premier_cru_2012,L7,L8),
-   replace_vin([chambolle,musigny,2012],chambolle_musigny_premier_cru_2012,L8,L9),
-   replace_vin([chambolle,musigny],chambolle_musigny_premier_cru_2012,L9,L10),
+remplace_variants([],L,L).
+remplace_variants([variant(Vin,Pattern)|Reste],Lin,Lout) :-
+   replace_vin(Pattern,Vin,Lin,Linter),
+   remplace_variants(Reste,Linter,Lout).
 
-   replace_vin([la,fleur,de,pomys,2012],la_fleur_de_pomys_2012,L10,L11),
-   replace_vin([la,fleur,de,pomys],la_fleur_de_pomys_2012,L11,L_mots_unif).
+vin_synonyme(beaumes_de_venise_2015, [beaumes,de,venise,2015]).
+vin_synonyme(beaumes_de_venise_2015, [beaumes,de,venise]).
+vin_synonyme(beaumes_de_venise_2015, [beaumesdevenise,2015]).
+vin_synonyme(beaumes_de_venise_2015, [beaumesdevenise]).
+
+vin_synonyme(les_chaboeufs_2013, [les,chaboeufs,2013]).
+vin_synonyme(les_chaboeufs_2013, [les,chaboeufs]).
+vin_synonyme(les_chaboeufs_2013, [nuits,saint,georges,premier,cru,2013]).
+vin_synonyme(les_chaboeufs_2013, [nuits,saint,georges,premier,cru]).
+vin_synonyme(les_chaboeufs_2013, [nuits,saint,georges,'1er',cru,2013]).
+vin_synonyme(les_chaboeufs_2013, [nuits,saint,georges,'1er',cru]).
+vin_synonyme(les_chaboeufs_2013, [nuits,saint,georges,2013]).
+vin_synonyme(les_chaboeufs_2013, [nuits,saint,georges]).
+vin_synonyme(les_chaboeufs_2013, [nuitssaintgeorges,2013]).
+vin_synonyme(les_chaboeufs_2013, [nuitssaintgeorges]).
+
+vin_synonyme(chambolle_musigny_premier_cru_2012, [chambolle,musigny,premier,cru,2012]).
+vin_synonyme(chambolle_musigny_premier_cru_2012, [chambolle,musigny,premier,cru]).
+vin_synonyme(chambolle_musigny_premier_cru_2012, [chambolle,musigny,'1er',cru,2012]).
+vin_synonyme(chambolle_musigny_premier_cru_2012, [chambolle,musigny,'1er',cru]).
+vin_synonyme(chambolle_musigny_premier_cru_2012, [chambolle,musigny,2012]).
+vin_synonyme(chambolle_musigny_premier_cru_2012, [chambolle,musigny]).
+vin_synonyme(chambolle_musigny_premier_cru_2012, [chambollemusigny,premier,cru,2012]).
+vin_synonyme(chambolle_musigny_premier_cru_2012, [chambollemusigny,premier,cru]).
+vin_synonyme(chambolle_musigny_premier_cru_2012, [chambollemusigny,'1er',cru,2012]).
+vin_synonyme(chambolle_musigny_premier_cru_2012, [chambollemusigny,'1er',cru]).
+vin_synonyme(chambolle_musigny_premier_cru_2012, [chambollemusigny,2012]).
+vin_synonyme(chambolle_musigny_premier_cru_2012, [chambollemusigny]).
+
+vin_synonyme(la_fleur_de_pomys_2012, [la,fleur,de,pomys,2012]).
+vin_synonyme(la_fleur_de_pomys_2012, [la,fleur,de,pomys]).
+vin_synonyme(la_fleur_de_pomys_2012, [lafleurdepomys,2012]).
+vin_synonyme(la_fleur_de_pomys_2012, [lafleurdepomys]).
 
 replace_vin(L,X,In,Out) :-
    append(L,Suf,In), !, Out = [X|Suf].
@@ -98,11 +135,16 @@ replace_vin(L,X,[H|In],[H|Out]) :-
 
 mclef(bouche,10).
 mclef(nez,10).
-mclef(prix,10).
 mclef(description, 10).
+mclef(prix,10).
 mclef(vin,5).
 mclef(vins,5).
 mclef(pourriezvous, 10).
+mclef(que,9).
+mclef(quel,9).
+mclef(parlez,2).
+mclef(parle,2).
+mclef(parlezvous,2).
 
 
 % ----------------------------------------------------------------%
@@ -113,10 +155,30 @@ regle_rep(bouche,1,
 
      bouche(Vin,Rep).
 
+regle_rep(bouche,2,
+  [ que, donne, Vin, en, bouche ],
+  Rep ) :-
+     bouche(Vin,Rep).
+
+regle_rep(bouche,3,
+  [ comment, est, Vin, en, bouche ],
+  Rep ) :-
+     bouche(Vin,Rep).
+
 % ----------------------------------------------------------------%
 
 regle_rep(nez,1,
   [ quel, nez, presente, le, Vin ],
+  Rep) :-
+    nez(Vin, Rep).
+
+regle_rep(nez,2,
+  [ quel, nez, presente, Vin ],
+  Rep) :-
+    nez(Vin, Rep).
+
+regle_rep(nez,3,
+  [ quel, nez, pour, Vin ],
   Rep) :-
     nez(Vin, Rep).
 
@@ -127,10 +189,37 @@ regle_rep(pourriezvous, 1,
   Rep ) :-
     description(Vin, Rep).
 
-    
-% ----------------------------------------------------------------%   
+regle_rep(pourriezvous, 2,
+  [ pourriezvous, men, dire, plus, sur, Vin ],
+  Rep ) :-
+    description(Vin, Rep).
 
+regle_rep(que,1,
+  [ que, pouvezvous, me, dire, sur, le, Vin ],
+  Rep) :-
+    description(Vin,Rep).
 
+regle_rep(parlez,1,
+  [ parlez, moi, du, Vin ],
+  Rep) :-
+    description(Vin,Rep).
+
+regle_rep(parlez,2,
+  [ parlez, moi, de, Vin ],
+  Rep) :-
+    description(Vin,Rep).
+
+regle_rep(parle,1,
+  [ parle, moi, du, Vin ],
+  Rep) :-
+    description(Vin,Rep).
+
+regle_rep(parlezvous,1,
+  [ parlezvous, du, Vin ],
+  Rep) :-
+    description(Vin,Rep).
+
+% ----------------------------------------------------------------%
 
 regle_rep(vins,2,
   [ auriezvous, des, vins, entre, X, et, Y, eur ],
@@ -436,16 +525,11 @@ grandgousier :-
 /*                                                                       */
 /*             ACTIVATION DU PROGRAMME APRES COMPILATION                 */
 /*                                                                       */
+/*  Le predicat grandgousier/0 n'est plus invoque automatiquement afin   */
+/*  de faciliter les tests automatisees. Utiliser scripts/run.sh pour    */
+/*  lancer l'assistant ou appeler grandgousier/0 manuellement.           */
+/*                                                                       */
 /* --------------------------------------------------------------------- */
-
-:- grandgousier.
-
-
-
-
-
-
-
 
 
 
