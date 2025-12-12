@@ -53,6 +53,10 @@ test(normalizes_beaumes_de_venise) :-
     nom_vins_uniforme([parlez, moi, du, beaumesdevenise, 2015], R),
     R = [parlez, moi, du, beaumes_de_venise_2015].
 
+test(normalizes_saint_emilion_appellation) :-
+    normaliser_question([quels, vins, de, saint, emilion, me, conseillezvous], R),
+    nth0(3, R, saint_emilion).
+
 test(description_parlez_moi_du) :-
     produire_reponse([parlez, moi, du, la, fleur, de, pomys], Rep),
     description(la_fleur_de_pomys_2012, Rep).
@@ -68,5 +72,75 @@ test(nez_variant) :-
 test(bouche_variant) :-
     produire_reponse([comment, est, nuits, saint, georges, en, bouche], Rep),
     bouche(les_chaboeufs_2013, Rep).
+
+test(bouche_short_pattern) :-
+    produire_reponse([bouche, de, nuits, saint, georges], Rep),
+    bouche(les_chaboeufs_2013, Rep).
+
+test(nez_short_pattern) :-
+    produire_reponse([nez, de, nuits, saint, georges], Rep),
+    nez(les_chaboeufs_2013, Rep).
+
+test(price_question_variant) :-
+    produire_reponse([auriez, vous, des, vins, entre, 20, et, 35, euros], Rep),
+    Rep = [[oui, ',', je, vous, propose, ces, vins, ':']|Liste],
+    memberchk([ '- ', 'La Fleur de Pomys 2012 - Saint Estephe', ' : ', 21.36, ' EUR'], Liste),
+    memberchk([ '- ', 'Hermitage rouge 2007', ' : ', 33.98, ' EUR'], Liste).
+
+test(price_question_empty) :-
+    produire_reponse([avez, vous, des, vins, entre, 1, et, 2, euros], [[non, ',', je, n, '\'', ai, aucun, vin, dans, cette, gamme, '.']]).
+
+test(price_less_than) :-
+    produire_reponse([avezvous, des, vins, a, moins, de, 10, euros], [Intro|Liste]),
+    Intro = [oui, ',', je, vous, propose, ces, vins, ':'],
+    memberchk([ '- ', 'Coteaux Bourguignons 2014', ' : ', 7.99, ' EUR' ], Liste).
+
+test(price_greater_than) :-
+    produire_reponse([avezvous, des, vins, a, plus, de, 60, euros], [Intro|Liste]),
+    Intro = [oui, ',', je, vous, propose, ces, vins, ':'],
+    memberchk([ '- ', 'Chambolle Musigny 1er Cru 2012 - Les Noirots', ' : ', 63.85, ' EUR' ], Liste).
+
+test(bourgogne_initial_recommendations) :-
+    produire_reponse([quels, vins, de, bourgogne, me, conseillezvous], [Intro|Liste]),
+    Intro = [voici, trois, vins, de, bourgogne, que, je, vous, conseille, ':'],
+    memberchk([ '- ', 'Coteaux Bourguignons 2014', ' : ', 'vin gouleyant et harmonieux', ' (', 7.99, ' EUR )' ], Liste),
+    memberchk([ '- ', 'Hautes Cotes de Nuits 2014', ' : ', 'fruit croquant, parfait pour la table', ' (', 15.16, ' EUR )' ], Liste).
+
+test(bourgogne_other_recommendations) :-
+    produire_reponse([auriezvous, dautres, vins, de, bourgogne], [Intro|Liste]),
+    Intro = [j, '\'', ai, aussi, d, autres, vins, de, bourgogne, a, vous, proposer, ':'],
+    memberchk([ '- ', 'Nuits-Saint-Georges 1er Cru 2013, Les Chaboeufs', ' : ', 'nuits saint georges 1er cru, puissant et race', ' (', 42.35, ' EUR )' ], Liste),
+    memberchk([ '- ', 'Chambolle Musigny 1er Cru 2012 - Les Noirots', ' : ', 'grand pinot soyeux et complexe', ' (', 63.85, ' EUR )' ], Liste).
+
+test(bourgogne_other_after_initial) :-
+    retractall(dernier_filtre(_,_)),
+    retractall(vins_proposes(_,_)),
+    produire_reponse([quels, vins, de, bourgogne, me, conseillezvous], _),
+    produire_reponse([auriezvous, dautres, vins, de, bourgogne], [Intro|Liste]),
+    Intro = [j, '\'', ai, aussi, d, autres, vins, de, bourgogne, a, vous, proposer, ':'],
+    memberchk([ '- ', 'Nuits-Saint-Georges 1er Cru 2013, Les Chaboeufs', ' : ', 'nuits saint georges 1er cru, puissant et race', ' (', 42.35, ' EUR )' ], Liste).
+
+test(graves_generic_recommendation) :-
+    retractall(dernier_filtre(_,_)),
+    retractall(vins_proposes(_,_)),
+    produire_reponse([quels, vins, de, graves, me, conseillezvous], [Intro|Liste]),
+    Intro = [voici, quelques, vins, de, graves, que, je, peux, vous, proposer, ':'],
+    memberchk([ '- ', 'Ch. Menota Cuvee Montagrede 2014 - Graves', ' : ', 'profil classique de graves', ' (', 9.46, ' EUR )' ], Liste),
+    memberchk([ '- ', 'Ch. Le Druc 2015 - Graves', ' : ', 'profil classique de graves', ' (', 7.62, ' EUR )' ], Liste).
+
+test(appellation_no_more_supplementaires_message) :-
+    produire_reponse([auriezvous, dautres, vins, de, saint, emilion], Rep),
+    Rep = [[je, n, '\'', ai, plus, d, autres, vins, pour, saint, emilion, '.']].
+
+test(canard_recommendation) :-
+    produire_reponse([je, cuisine, du, canard, quel, vin, me, conseillezvous], [Intro1,Intro2|Groupes]),
+    Intro1 = [ 'Pour le canard, je vous conseille des vins rouges puissants aux notes epicees et fumees.' ],
+    Intro2 = [ 'Voici des appellations qui fonctionnent tres bien :' ],
+    memberchk([bordeaux, ': ', 'graves, saint_emilion, pomerol'], Groupes),
+    memberchk([rhone_nord, ': ', 'cote_rotie, saint_joseph, hermitage'], Groupes).
+
+test(appellation_definition) :-
+    produire_reponse([que, recouvre, lappellation, haut, medoc], Rep),
+    definition_appellation(haut_medoc,Rep).
 
 :- end_tests(phase01).

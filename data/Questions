@@ -7,3 +7,28 @@ quel nez presente le chambolle musigny premier cru 2012 ?
 pourriezvous men dire plus sur la fleur de pomys ?
 
 parlez moi du beaumesdevenise 2015
+
+
+
+
+À terme, votre bot doit couvrir au minimum les familles de questions suivantes (celles explicitement conseillées comme base, puis l’extension) 
+
+:
+
+Conseiller des vins d’une appellation/région
+Ex: « Quels vins de Bourgogne me conseillez-vous ? »
+
+Décrire un vin: bouche, nez, description globale
+Ex: « Que donne le Nuits-Saint-Georges en bouche ? », « Quel nez présente le Chambolle-Musigny ? », « Pourriez-vous m’en dire plus sur La Fleur de Pomys ? »
+
+Expliquer une appellation
+Ex: « Que recouvre l’appellation Haut-Médoc ? »
+
+Gérer une contrainte de prix
+Ex: « Auriez-vous des vins entre 20 et 35 EUR ? »
+
+Conseiller un vin selon un plat/repas
+Ex: « Pour Noël, canard. Quel vin me conseillez-vous ? »
+
+Gérer la continuité du dialogue
+Ex: « Auriez-vous d’autres vins de Bourgogne ? » (référence à la demande précédente)

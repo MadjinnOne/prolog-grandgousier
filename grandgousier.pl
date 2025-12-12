@@ -1,6 +1,9 @@
 :- use_module(library(lists)).
 :- use_module(library(pairs)).
 :- use_module(base_vins).      % <--- on charge la base de connaissances
+:- discontiguous regle_rep/4.
+:- dynamic dernier_filtre/2.
+:- dynamic vins_proposes/2.
 /* --------------------------------------------------------------------- */
 /*                                                                       */
 /*        PRODUIRE_REPONSE(L_Mots,L_Lignes_reponse) :                    */
@@ -29,8 +32,9 @@ produire_reponse([fin],[L1]) :-
    L1 = [merci, de, m, '\'', avoir, consulte], !.
 
 produire_reponse(L,Rep) :-
-%   write(L),
-   mclef(M,_), member(M,L),
+   normaliser_question(L,L_norm),
+%   write(L_norm),
+   mclef(M,_), member(M,L_norm),
    clause(regle_rep(M,_,Pattern,Rep),Body),
    match_pattern(Pattern,L),
    call(Body), !.
@@ -41,12 +45,12 @@ produire_reponse(_,[L1,L2, L3]) :-
    L3 = ['vous le verrez !'].
 
 match_pattern(Pattern,Lmots) :-
-   nom_vins_uniforme(Lmots,Lmots_unif),
-   sublist(Pattern,Lmots_unif).
+   normaliser_question(Lmots,Lmots_norm),
+   sublist(Pattern,Lmots_norm).
 
 match_pattern(LPatterns,Lmots) :-
-   nom_vins_uniforme(Lmots,Lmots_unif),
-   match_pattern_dist([100|LPatterns],Lmots_unif).
+   normaliser_question(Lmots,Lmots_norm),
+   match_pattern_dist([100|LPatterns],Lmots_norm).
 
 match_pattern_dist([],_).
 match_pattern_dist([N,Pattern|Lpatterns],Lmots) :-
@@ -71,9 +75,69 @@ sublistrem(SL,[_|T],Lr) :- sublistrem(SL,T,Lr).
 prefixrem([],L,L).
 prefixrem([H|T],[H|L],Lr) :- prefixrem(T,L,Lr).
 
+normaliser_question(Lmots,L_out) :-
+   nom_vins_uniforme(Lmots,Ltmp),
+   normaliser_appellations_tokens(Ltmp,Lapp),
+   maplist(normaliser_mot,Lapp,L_out).
+
+normaliser_mots_clefs(Lin,Lout) :-
+    maplist(normaliser_mot,Lin,Lout).
+
+normaliser_mot(lappellation,appellation) :- !.
+normaliser_mot(Mot,Mot).
+
 nom_vins_uniforme(Lmots,L_mots_unif) :-
    normalisation_variants(Variants),
    remplace_variants(Variants,Lmots,L_mots_unif).
+
+normaliser_appellations_tokens(Lin,Lout) :-
+   findall(Key-app(App,Pattern),
+      ( appellation_synonymes(App,Syns),
+        member(Pattern,Syns),
+        length(Pattern,Len),
+        Key is -Len
+      ),
+      Raw),
+   keysort(Raw,Sorted),
+   pairs_values(Sorted,Variants),
+   remplace_appellations(Variants,Lin,Lout).
+
+remplace_appellations([],L,L).
+remplace_appellations([app(App,Pattern)|Rest],Lin,Lout) :-
+   replace_vin(Pattern,App,Lin,Linter),
+   remplace_appellations(Rest,Linter,Lout).
+
+appellation_synonymes(App,Syns) :-
+   ( var(App)
+   -> setof(A, source_appellation(A), Apps), member(App,Apps)
+   ;  source_appellation(App)
+   ),
+   findall(Pattern, base_appellation_synonyme(App,Pattern), Raw),
+   sort(Raw,Syns),
+   Syns \= [].
+
+source_appellation(App) :-
+   appellation_synonymes_fact(App,_).
+source_appellation(App) :-
+   appellation(_,App).
+
+base_appellation_synonyme(App,Pattern) :-
+   appellation_synonymes_fact(App,Syns),
+   member(Pattern,Syns).
+base_appellation_synonyme(App,Pattern) :-
+   default_appellation_pattern(App,Pattern).
+
+default_appellation_pattern(App,Pattern) :-
+   atom(App),
+   atomic_list_concat(Pattern,'_',App),
+   Pattern \= [].
+
+appellation_tokens(App,Tokens) :-
+   default_appellation_pattern(App,Tokens).
+
+humanize_appellation(App,Human) :-
+   appellation_tokens(App,Tokens),
+   atomic_list_concat(Tokens,' ',Human).
 
 normalisation_variants(Variants) :-
    findall(Key-variant(Vin,Pattern),
@@ -142,9 +206,16 @@ mclef(vins,5).
 mclef(pourriezvous, 10).
 mclef(que,9).
 mclef(quel,9).
+mclef(bourgogne,9).
+mclef(dautres,7).
+mclef(autres,7).
+mclef(moins,7).
+mclef(plus,7).
+mclef(canard,8).
 mclef(parlez,2).
 mclef(parle,2).
 mclef(parlezvous,2).
+mclef(appellation,8).
 
 
 % ----------------------------------------------------------------%
@@ -165,6 +236,16 @@ regle_rep(bouche,3,
   Rep ) :-
      bouche(Vin,Rep).
 
+regle_rep(bouche,4,
+  [ que, donne, Vin, en, bouche, '?' ],
+  Rep) :-
+     bouche(Vin,Rep).
+
+regle_rep(bouche,5,
+  [ bouche, de, Vin ],
+  Rep) :-
+     bouche(Vin,Rep).
+
 % ----------------------------------------------------------------%
 
 regle_rep(nez,1,
@@ -179,6 +260,16 @@ regle_rep(nez,2,
 
 regle_rep(nez,3,
   [ quel, nez, pour, Vin ],
+  Rep) :-
+    nez(Vin, Rep).
+
+regle_rep(nez,4,
+  [ quel, nez, pour, Vin, '?' ],
+  Rep) :-
+    nez(Vin, Rep).
+
+regle_rep(nez,5,
+  [ nez, de, Vin ],
   Rep) :-
     nez(Vin, Rep).
 
@@ -219,31 +310,395 @@ regle_rep(parlezvous,1,
   Rep) :-
     description(Vin,Rep).
 
+% ----- Conseils Bourgogne -----
+
+conseil_appellation_fact(bourgogne, principales,
+  [ voici, trois, vins, de, bourgogne, que, je, vous, conseille, ':' ],
+  [
+    rec(coteaux_bourguignons_2014, 'vin gouleyant et harmonieux'),
+    rec(bourgogne_pinot_noir_les_marnes_2014, 'pinot noir charmeur, grande souplesse'),
+    rec(hautes_cotes_de_nuits_2014, 'fruit croquant, parfait pour la table')
+  ]).
+
+conseil_appellation_fact(bourgogne, supplementaires,
+  [ j, '\'', ai, aussi, d, autres, vins, de, bourgogne, a, vous, proposer, ':' ],
+  [
+    rec(les_chaboeufs_2013, 'nuits saint georges 1er cru, puissant et race'),
+    rec(chambolle_musigny_premier_cru_2012, 'grand pinot soyeux et complexe')
+  ]).
+
+conseil_appellation(App,Type,Intro,Lrec) :-
+   conseil_appellation_fact(App,Type,Intro,Lrec), !.
+conseil_appellation(App,Type,Intro,Lrec) :-
+   default_conseil_appellation(App,Type,Intro,Lrec).
+
+regle_rep(bourgogne,1,
+  [ quels, vins, de, bourgogne, me, conseillezvous ],
+  Rep) :-
+     reponse_conseil(bourgogne,principales,Rep).
+
+regle_rep(bourgogne,2,
+  [ quels, vins, de, bourgogne, me, conseillez, vous ],
+  Rep) :-
+     reponse_conseil(bourgogne,principales,Rep).
+
+regle_rep(bourgogne,3,
+  [ auriezvous, dautres, vins, de, bourgogne ],
+  Rep) :-
+     reponse_conseil(bourgogne,supplementaires,Rep).
+
+regle_rep(bourgogne,4,
+  [ auriezvous, autres, vins, de, bourgogne ],
+  Rep) :-
+     reponse_conseil(bourgogne,supplementaires,Rep).
+
+regle_rep(bourgogne,5,
+  [ auriez, vous, d, autres, vins, de, bourgogne ],
+  Rep) :-
+     reponse_conseil(bourgogne,supplementaires,Rep).
+
+regle_rep(vins,12,
+  [ quels, vins, de, App, me, conseillezvous ],
+  Rep) :-
+     reponse_conseil(App,principales,Rep).
+
+regle_rep(vins,13,
+  [ quels, vins, de, App, me, conseillez, vous ],
+  Rep) :-
+     reponse_conseil(App,principales,Rep).
+
+regle_rep(vins,14,
+  [ auriezvous, des, vins, de, App ],
+  Rep) :-
+     reponse_conseil(App,principales,Rep).
+
+regle_rep(vins,15,
+  [ avezvous, des, vins, de, App ],
+  Rep) :-
+     reponse_conseil(App,principales,Rep).
+
+regle_rep(vin,1,
+  [ quel, vin, de, App, me, conseillezvous ],
+  Rep) :-
+     reponse_conseil(App,principales,Rep).
+
+regle_rep(vin,2,
+  [ quel, vin, de, App, me, conseillez, vous ],
+  Rep) :-
+     reponse_conseil(App,principales,Rep).
+
+regle_rep(dautres,1,
+  [ auriezvous, dautres, vins, de, App ],
+  Rep) :-
+     reponse_conseil(App,supplementaires,Rep).
+
+regle_rep(autres,1,
+  [ auriezvous, d, autres, vins, de, App ],
+  Rep) :-
+     reponse_conseil(App,supplementaires,Rep).
+
+regle_rep(autres,2,
+  [ auriez, vous, d, autres, vins, de, App ],
+  Rep) :-
+     reponse_conseil(App,supplementaires,Rep).
+
+regle_rep(autres,3,
+  [ auriezvous, autres, vins, de, App ],
+  Rep) :-
+     reponse_conseil(App,supplementaires,Rep).
+
+regle_rep(autres,4,
+  [ auriez, vous, autres, vins, de, App ],
+  Rep) :-
+     reponse_conseil(App,supplementaires,Rep).
+
+reponse_conseil(App,Type,Rep) :-
+   conseil_appellation(App,Type,Intro,Lrec),
+   lignes_recommandations(Lrec,Intro,Rep),
+   retractall(dernier_filtre(_,_)),
+   asserta(dernier_filtre(appellation,App)),
+   retractall(vins_proposes(appellation(_),_)),
+   assertz(vins_proposes(appellation(App),Type)).
+
+lignes_recommandations([],Intro,[Intro]).
+lignes_recommandations(Lrec,Intro,[Intro|Lines]) :-
+    maplist(format_ligne_recommandation, Lrec, Lines).
+
+format_ligne_recommandation(rec(Vin,Commentaire), Line) :-
+    nom(Vin,Nom),
+    prix(Vin,Prix),
+    Line = [ '- ', Nom, ' : ', Commentaire, ' (', Prix, ' EUR )' ].
+
+selection_limit(principales,3).
+selection_limit(supplementaires,3).
+
+default_conseil_appellation(App, principales, Intro, Lrec) :-
+   collect_vins_appellation(App,Vins),
+   ( Vins == []
+   -> phrase_appellation([je, n, '\'', ai, aucun, vin, pour], App, ['.'], Intro),
+      Lrec = []
+   ;  selection_limit(principales,Limit),
+      take_n(Vins,Limit,Selection,_),
+      intro_principales(App,Intro),
+      maplist(rec_appellation(App,principales),Selection,Lrec)
+   ).
+
+default_conseil_appellation(App, supplementaires, Intro, Lrec) :-
+   collect_vins_appellation(App,Vins),
+   selection_limit(principales,FirstBatch),
+   drop_n(Vins,FirstBatch,Remaining),
+   ( Remaining == []
+   -> phrase_appellation([je, n, '\'', ai, plus, d, autres, vins, pour], App, ['.'], Intro),
+      Lrec = []
+   ;  selection_limit(supplementaires,Limit),
+      take_n(Remaining,Limit,Selection,_),
+      intro_supplementaires(App,Intro),
+      maplist(rec_appellation(App,supplementaires),Selection,Lrec)
+   ).
+
+collect_vins_appellation(App,Vins) :-
+   findall(Prix-Vin, (appellation(Vin,App), prix(Vin,Prix)), Raw),
+   keysort(Raw,Pairs),
+   pairs_values(Pairs,Vins).
+
+rec_appellation(App,Type,Vin,rec(Vin,Commentaire)) :-
+   commentaire_appellation(App,Type,Commentaire).
+
+commentaire_appellation(App,principales,Commentaire) :-
+   humanize_appellation(App,Human),
+   format(atom(Commentaire), 'profil classique de ~w', [Human]).
+commentaire_appellation(App,supplementaires,Commentaire) :-
+   humanize_appellation(App,Human),
+   format(atom(Commentaire), 'autre selection de ~w', [Human]).
+
+intro_principales(App,Intro) :-
+   phrase_appellation(
+      [voici, quelques, vins, de],
+      App,
+      [que, je, peux, vous, proposer, ':'],
+      Intro).
+
+intro_supplementaires(App,Intro) :-
+   phrase_appellation(
+      [j, '\'', ai, aussi, d, autres, vins, de],
+      App,
+      [a, vous, proposer, ':'],
+      Intro).
+
+phrase_appellation(Prefix,App,Suffix,Ligne) :-
+   appellation_tokens(App,Tokens),
+   append(Prefix,Tokens,Temp),
+   append(Temp,Suffix,Ligne).
+
+take_n(List,N,Take,Rest) :-
+   (  N =< 0
+   -> Take = [],
+      Rest = List
+   ;  List = [H|T]
+   -> Take = [H|R],
+      N1 is N-1,
+      take_n(T,N1,R,Rest)
+   ;  Take = [],
+      Rest = []
+   ).
+
+drop_n(List,N,Rest) :-
+   (  N =< 0
+   -> Rest = List
+   ;  List = [_|T]
+   -> N1 is N-1,
+      drop_n(T,N1,Rest)
+   ;  Rest = []
+   ).
+
+% ----- Accords mets-vins -----
+
+profil_plat(canard,
+  [ [ 'Pour le canard, je vous conseille des vins rouges puissants aux notes epicees et fumees.' ],
+    [ 'Voici des appellations qui fonctionnent tres bien :' ] ],
+  [ bordeaux-[graves, saint_emilion, pomerol],
+    bourgogne-[marsannay, fixin, nuits_saint_georges, gevrey_chambertin],
+    rhone_nord-[cote_rotie, saint_joseph, hermitage]
+  ]).
+
+regle_rep(canard,1,
+  [ je, cuisine, du, canard, quel, vin, me, conseillezvous ],
+  Rep) :-
+    reponse_plat(canard,Rep).
+
+regle_rep(canard,2,
+  [ pour, noel, j, '\'', envisage, de, cuisiner, du, canard, quel, vin, me, conseillezvous ],
+  Rep) :-
+    reponse_plat(canard,Rep).
+
+regle_rep(canard,3,
+  [ canard, quel, vin, me, conseillezvous ],
+  Rep) :-
+    reponse_plat(canard,Rep).
+
+regle_rep(canard,4,
+  [ je, vais, preparer, du, canard, quel, vin, me, conseillezvous ],
+  Rep) :-
+    reponse_plat(canard,Rep).
+
+reponse_plat(Plat,Rep) :-
+    profil_plat(Plat,Intro,Groupes),
+    maplist(format_ligne_plat,Groupes,Lignes),
+    append(Intro,Lignes,Rep).
+
+format_ligne_plat(Region-Appellations,Line) :-
+    atomic_list_concat(Appellations,', ',AppsTexte),
+    Line = [ Region, ': ', AppsTexte ].
+
+% ----- Definition d'appellations -----
+
+definition_appellation(haut_medoc,
+  [ [ 'Le haut medoc couvre la partie sud du medoc traditionnel.' ],
+    [ 'On y trouve des terroirs de graves, souvent proches de la Garonne.' ],
+    [ 'L appellation regroupe plusieurs communes comme Macau, Parempuyre, ou encore Avensan.' ] ]).
+
+appellation_synonymes_fact(haut_medoc,
+  [ [ haut, medoc ],
+    [ hautmedoc ],
+    [ l, '\'', appellation, haut, medoc ],
+    [ appellation, haut, medoc ] ]).
+
+definition_appellation_par_defaut(
+  [ [ je, n, '\'', ai, pas, d, informations, sur, cette, appellation, '.' ] ]).
+
+regle_rep(appellation,1,
+  [ que, recouvre, appellation, App ],
+  Rep) :-
+    normaliser_appellation(App,Id),
+    definition_appellation(Id,Rep).
+
+regle_rep(appellation,2,
+  [ que, recouvre, appellation, App, '?' ],
+  Rep) :-
+    normaliser_appellation(App,Id),
+    definition_appellation(Id,Rep).
+
+regle_rep(appellation,3,
+  [ que, recouvre, l, '\'', appellation, App ],
+  Rep) :-
+    normaliser_appellation(App,Id),
+    definition_appellation(Id,Rep).
+
+regle_rep(appellation,4,
+  [ que, recouvre, l, '\'', appellation, App, '?' ],
+  Rep) :-
+    normaliser_appellation(App,Id),
+    definition_appellation(Id,Rep).
+
+regle_rep(appellation,5,
+  [ que, recouvre, appellation, App ],
+  Rep) :-
+    normaliser_appellation(App,Id),
+    definition_appellation(Id,Rep).
+
+normaliser_appellation(AppAtom,Id) :-
+    atom_codes(AppAtom,Codes),
+    exclude(=(39),Codes,CleanCodes),
+    atom_codes(CleanAtom,CleanCodes),
+    (   definition_appellation(CleanAtom,_)
+    ->  Id = CleanAtom
+    ;   appellation_synonymes(Id,Syns),
+        member(Syn,Syns),
+        atomic_list_concat(Syn,'_',CleanAtom)
+    ), !.
+
 % ----------------------------------------------------------------%
 
-regle_rep(vins,2,
+regle_rep(vins,1,
   [ auriezvous, des, vins, entre, X, et, Y, eur ],
   Rep) :-
+     repondre_vins_prix(X,Y,Rep).
 
+regle_rep(vins,2,
+  [ auriez, vous, des, vins, entre, X, et, Y, eur ],
+  Rep) :-
+     repondre_vins_prix(X,Y,Rep).
+
+regle_rep(vins,3,
+  [ avezvous, des, vins, entre, X, et, Y, euros ],
+  Rep) :-
+     repondre_vins_prix(X,Y,Rep).
+
+regle_rep(vins,4,
+  [ avez, vous, des, vins, entre, X, et, Y, euros ],
+  Rep) :-
+     repondre_vins_prix(X,Y,Rep).
+
+regle_rep(vins,5,
+  [ auriezvous, des, vins, entre, X, et, Y ],
+  Rep) :-
+     repondre_vins_prix(X,Y,Rep).
+
+regle_rep(vins,6,
+  [ auriez, vous, des, vins, entre, X, et, Y, euros ],
+  Rep) :-
+     repondre_vins_prix(X,Y,Rep).
+
+regle_rep(vins,7,
+  [ auriezvous, des, vins, entre, X, et, Y, euros ],
+  Rep) :-
+     repondre_vins_prix(X,Y,Rep).
+
+regle_rep(vins,8,
+  [ avezvous, des, vins, a, moins, de, Max, euros ],
+  Rep) :-
+     repondre_vins_prix(0,Max,Rep).
+
+regle_rep(vins,9,
+  [ avezvous, des, vins, a, moins, de, Max ],
+  Rep) :-
+     repondre_vins_prix(0,Max,Rep).
+
+regle_rep(vins,10,
+  [ avezvous, des, vins, a, plus, de, Min, euros ],
+  Rep) :-
+     repondre_vins_prix(Min,inf,Rep).
+
+regle_rep(vins,11,
+  [ avezvous, des, vins, a, plus, de, Min ],
+  Rep) :-
+     repondre_vins_prix(Min,inf,Rep).
+
+regle_rep(moins,1,
+  [ des, vins, a, moins, de, Max, euros ],
+  Rep) :-
+     repondre_vins_prix(0,Max,Rep).
+
+regle_rep(plus,1,
+  [ des, vins, a, plus, de, Min, euros ],
+  Rep) :-
+     repondre_vins_prix(Min,inf,Rep).
+
+repondre_vins_prix(X,Y,Rep) :-
      lvins_prix_min_max(X,Y,Lvins),
      rep_lvins_min_max(Lvins,Rep).
 
-rep_lvins_min_max([], [[ non, '.' ]]).
-rep_lvins_min_max([H|T], [ [ oui, '.', je, dispose, de ] | L]) :-
+rep_lvins_min_max([], [[ non, ',', je, n, '\'', ai, aucun, vin, dans, cette, gamme, '.']]).
+rep_lvins_min_max([H|T], [ [ oui, ',', je, vous, propose, ces, vins, ':' ] | L]) :-
    rep_litems_vin_min_max([H|T],L).
 
 rep_litems_vin_min_max([],[]) :- !.
 rep_litems_vin_min_max([(V,P)|L], [Irep|Ll]) :-
    nom(V,Appellation),
-   Irep = [ '- ', Appellation, '(', P, ' EUR )' ],
+   Irep = [ '- ', Appellation, ' : ', P, ' EUR' ],
    rep_litems_vin_min_max(L,Ll).
 
 prix_vin_min_max(Vin,P,Min,Max) :-
    prix(Vin,P),
-   Min =< P, P =< Max.
+   Min =< P,
+   (Max == inf -> true ; P =< Max).
 
 lvins_prix_min_max(Min,Max,Lvins) :-
-   findall( (Vin,P) , prix_vin_min_max(Vin,P,Min,Max), Lvins ).
+   findall( (Vin,P) , prix_vin_min_max(Vin,P,Min,Max), Tmp),
+   predsort(compare_prix, Tmp, Lvins).
+
+compare_prix(<, (_,P1), (_,P2)) :- P1 =< P2, !.
+compare_prix(>,_,_).
 
 
 
@@ -530,7 +985,3 @@ grandgousier :-
 /*  lancer l'assistant ou appeler grandgousier/0 manuellement.           */
 /*                                                                       */
 /* --------------------------------------------------------------------- */
-
-
-
-
