@@ -137,13 +137,6 @@ prix(cognac_trois_etoiles, 20.87).
 prix(cognac_fine_champagne_vsop, 22.26).
 prix(cognac_grande_champagne_hors_age, 32.28).
 
-bouche(beaumes_de_venise_2015,
-  [ [ 'les aromes de fraise, de violette cotoient les nuances' ],
-    [ 'de baies de genevrier, de sureau et une delicate touche' ],
-    [ 'de fleur d\'oranger. Cette intensite se poursuit en' ],
-    [ 'bouche avec des saveurs juteuses, racees et tres elegantes', '.' ]
-  ]).
-
 nez(beaumes_de_venise_2015,
   [ [ nez, intensement, parfume, '.' ]
 ]).
@@ -152,8 +145,534 @@ nez(les_chaboeufs_2013,
   [ [ 'belle intensite aromatique de griotte sous bois et champignon', '.' ]
   ]).
 
+nez(ch_moulin_de_mallet_2014,
+  [ [ nez, parfume, de, fruits, rouges, telles, que, cerise, et, mure, ',' ],
+    [ 'boise integre', '.' ]
+  ]).
+
+nez(ch_la_fleur_baudron_2014,
+  [ [ 'aromes de fruits compotes et epices fines', '.' ],
+    [ 'nuance florale', '.' ]
+  ]).
+
+nez(ch_bois_vert_elegance_2014,
+  [ [ 'dominante de violette et cassis avec nuance empyreumatique', '.' ]
+  ]).
+
+nez(ch_menota_cuvee_montagrede_2014,
+  [ [ 'fruits noirs et epices avec nuances empyreumatiques', '.' ]
+  ]).
+
+nez(syrah_2015_vin_de_pays_doc,
+  [ [ 'fruits rouges et agrumes avec notes epicees', '.' ]
+  ]).
+
+nez(coteaux_bourguignons_2014,
+  [ [ 'aromes de cerise associes a des nuances florales', '.' ]
+  ]).
+
+nez(champagne_brut_reserve,
+  [ [ 'nez complexe harmonieux et delicat', '.' ]
+  ]).
+
+nez(ch_paret_2012,
+  [ [ 'nez profond avec fruits noirs chocolat et sous bois', '.' ]
+  ]).
+
+nez(madiran_vieilles_vignes_2006,
+  [ [ 'notes de fruits noirs avec touche cacao', '.' ]
+  ]).
+
+nez(ch_du_moulin_neuf_prestige_2014,
+  [ [ 'fruits noirs confitures avec notes fumees et chocolatees', '.' ]
+  ]).
+
+nez(ch_milon_la_grave_particuliere_2012,
+  [ [ 'fruits rouges violette et nuances empyreumatiques', '.' ]
+  ]).
+
+nez(ch_roc_de_binet_2010,
+  [ [ 'cassis cerise violette et truffe', '.' ]
+  ]).
+
+nez(ch_ruat_petit_poujeaux_2010,
+  [ [ 'bouquet intense de fruits noirs avec nuances torrefiees', '.' ]
+  ]).
+
+nez(ch_les_polyanthas_2010,
+  [ [ 'aromes truffes fruites et epices', '.' ]
+  ]).
+
+nez(ch_la_menotte_2012,
+  [ [ 'bouquet intense fruits fleurs nuances truffees et cafe', '.' ]
+  ]).
+
+nez(la_fleur_de_pomys_2012,
+  [ [ 'nez empyreumatique myrtille cassis et boise integre', '.' ]
+  ]).
+
+nez(pauillac_2011,
+  [ [ 'fruits noirs avec touche bois de vigne et reglisse', '.' ]
+  ]).
+
+nez(florilege_saint_julien_2010,
+  [ [ 'nez dense cremeux avec trame tannique enrobee', '.' ]
+  ]).
+
+nez(florilege_pomerol_2012,
+  [ [ 'dominante de fruits rouges avec nuances torrefiees et epicees', '.' ]
+  ]).
+
+nez(cotes_du_rhone_villages_pierre_charlotte_2014,
+  [ [ 'bouquet charmant fruits rouges mures et fruits a noyau', ',' ],
+    [ 'nuances de garrigue bois de cedre et agrumes', '.' ]
+  ]).
+
+nez(tautavel_2014,
+  [ [ 'fruits noirs epices chocolat et garrigue', '.' ]
+  ]).
+
+nez(lirac_2015,
+  [ [ 'fruits a noyaux et epices cannelle reglisse', '.' ]
+  ]).
+
+nez(cairanne_2014,
+  [ [ 'aromes tres expressifs guimauve genevrier et tabac', '.' ]
+  ]).
+
+nez(vacqueyras_2014,
+  [ [ 'nez aromatique fruits surmuris guimauve reglisse', '.' ]
+  ]).
+
+nez(saint_joseph_2014,
+  [ [ 'syrah nord fruits pamplemousse epices poivre et bois brule', '.' ]
+  ]).
+
+nez(gigondas_2014,
+  [ [ 'nez riche et concentre avec fond remarquable', '.' ]
+  ]).
+
+nez(chateauneuf_du_pape_rouge_2013,
+  [ [ 'nez complexe suave fruits rouges cannelle et epices', '.' ]
+  ]).
+
+nez(hermitage_rouge_2007,
+  [ [ 'fruits noirs agrumes vanille tabac et reglisse', '.' ]
+  ]).
+
+nez(bourgogne_pinot_noir_les_marnes_2014,
+  [ [ 'parfum de griottes et fruits des bois avec notes epicees', '.' ]
+  ]).
+
+nez(hautes_cotes_de_nuits_2014,
+  [ [ 'nez expressif fruits rouges groseilles griottes nuances florales', '.' ]
+  ]).
+
+nez(savigny_les_beaune_2014,
+  [ [ 'nez intense charmeur de fruits murs et pain d epice', '.' ]
+  ]).
+
+nez(savigny_les_beaune_premier_cru_2014,
+  [ [ 'nez gourmand fruits rouges encens et grain de cafe', '.' ]
+  ]).
+
+nez(aloxe_corton_2014,
+  [ [ 'intensite aromatique grotte sous bois grain de cafe et epices', '.' ]
+  ]).
+
+nez(chambolle_musigny_premier_cru_2012,
+  [ [ 'fruits rouges epices poivre nuances empyreumatiques et sous bois', '.' ]
+  ]).
+
+nez(chiroubles_2013,
+  [ [ 'fruits rouges groseilles fraises et epices', '.' ]
+  ]).
+
+nez(fleurie_2015,
+  [ [ 'nez elegant melant fruit epices et nuances florales', '.' ]
+  ]).
+
+nez(moulin_a_vent_2014,
+  [ [ 'fruits sauvages grotte sous bois et nuance de cire', '.' ]
+  ]).
+
+nez(chinon_vieilles_vignes_2014,
+  [ [ 'cabernet franc mur reglisse noire vanille fruits rouges et sous bois', '.' ]
+  ]).
+
+nez(sancerre_rouge_2015,
+  [ [ 'nez pinot cerise fruits des bois sous bois champignons', '.' ]
+  ]).
+
+nez(les_guignards_2015,
+  [ [ 'cassis et fruits du verger avec nuances d agrumes et de rose', '.' ]
+  ]).
+
+nez(chardonnay_exception_2016,
+  [ [ 'aromes intenses de fruits du verger avec touche boisee', '.' ]
+  ]).
+
+nez(cotes_du_rhone_blanc_pierre_charlotte_2016,
+  [ [ 'abricot et peche blanche avec nuances de fruits secs et epices', '.' ]
+  ]).
+
+nez(ch_le_druc_2015,
+  [ [ 'nez expressif d abricot agrumes et nuances florales grillees', '.' ]
+  ]).
+
+nez(laudun_2016,
+  [ [ 'nez intense fruits du verger epices et note citronnee', '.' ]
+  ]).
+
+nez(vouvray_blanc_sec_2016,
+  [ [ 'aromes de chenin tilleul et nuance de rose', '.' ]
+  ]).
+
+nez(macon_villages_2015,
+  [ [ 'fruits pomme et coing avec notes de beurre et miel', '.' ]
+  ]).
+
+nez(pinot_gris_2015,
+  [ [ 'nez parfume de fruits frais a chair blanche et exotiques', '.' ]
+  ]).
+
+nez(gewurztraminer_2015,
+  [ [ 'fruits a chair blanche et exotiques avec fleurs et epices', '.' ]
+  ]).
+
+nez(vire_clesse_2016,
+  [ [ 'aromes intenses de pomme coing peche et miel', '.' ]
+  ]).
+
+nez(sancerre_blanc_verdigny_2015,
+  [ [ 'nez race minéral avec fruits murs cassis eglantier et buis', '.' ]
+  ]).
+
+nez(vacqueyras_blanc_2016,
+  [ [ 'intensite aromatique abricot peche blanche raisin frais et poire', ',' ],
+    [ 'nuances epicees pain grille et thym', '.' ]
+  ]).
+
+nez(hautes_cotes_de_beaune_2015,
+  [ [ 'nez parfume fleurs blanches fruits du verger et noisettes', '.' ]
+  ]).
+
+nez(pouilly_fuisse_2014,
+  [ [ 'nez mineral elegant notes de coing pomme noisette grillee et beurre', '.' ]
+  ]).
+
+nez(chablis_premier_cru_montmains_2014,
+  [ [ 'nez intense de fruits du verger avec nuances iodees et noisettees', '.' ]
+  ]).
+
+nez(condrieu_2015,
+  [ [ 'intensite aromatique riche abricot peche et epices', '.' ]
+  ]).
+
+nez(cremant_de_loire_brut,
+  [ [ 'nez associant rondeur du chardonnay et caractere floral du chenin', '.' ]
+  ]).
+
+nez(champagne_extra_brut,
+  [ [ 'nez de finesse et d elegance a l etat pur', '.' ]
+  ]).
+
+nez(champagne_brut_oeil_de_perdrix,
+  [ [ 'notes de fruits rouges cerise et framboise avec sous bois', '.' ]
+  ]).
+
+nez(champagne_brut_rose_de_saignee,
+  [ [ 'notes de fruits rouges cerise petite framboise et sous bois', '.' ]
+  ]).
+
+nez(champagne_brut_or_blanc,
+  [ [ 'chardonnay mur sur notes de fleur d acacia citron et peche blanche', '.' ]
+  ]).
+
+nez(champagne_brut_prestige,
+  [ [ 'nez complexe puissant evolue fruits secs et miel', '.' ]
+  ]).
+
+nez(cognac_trois_etoiles,
+  [ [ 'belle intensite de fruit avec epices et ecorce d orange', '.' ]
+  ]).
+
+nez(cognac_fine_champagne_vsop,
+  [ [ 'nez puissant avec beaucoup de finesse', '.' ]
+  ]).
+
+nez(cognac_grande_champagne_hors_age,
+  [ [ 'nez intense complexe et tres fin', '.' ]
+  ]).
+
+bouche(beaumes_de_venise_2015,
+  [ [ 'les aromes de fraise, de violette cotoient les nuances' ],
+    [ 'de baies de genevrier, de sureau et une delicate touche' ],
+    [ 'de fleur d\'oranger. Cette intensite se poursuit en' ],
+    [ 'bouche avec des saveurs juteuses, racees et tres elegantes', '.' ]
+  ]).
+
 bouche(les_chaboeufs_2013,
   [ [ 'texture epaisse reunissant puissance richesse rondeur et longueur', '.' ]
+  ]).
+
+bouche(ch_moulin_de_mallet_2014,
+  [ [ 'tannins fins et bel equilibre avec une touche de boise', '.' ]
+  ]).
+
+bouche(ch_la_fleur_baudron_2014,
+  [ [ 'texture riche et plaisante avec des tannins soyeux', '.' ]
+  ]).
+
+bouche(ch_bois_vert_elegance_2014,
+  [ [ 'saveurs genereuses et rondes avec boise elegant', '.' ]
+  ]).
+
+bouche(ch_menota_cuvee_montagrede_2014,
+  [ [ 'texture ronde et veloutee aux tannins soyeux', '.' ]
+  ]).
+
+bouche(syrah_2015_vin_de_pays_doc,
+  [ [ 'caractere enrobe de fruits rouges et nuance de reglisse', '.' ]
+  ]).
+
+bouche(coteaux_bourguignons_2014,
+  [ [ 'saveurs juteuses dans un style gouleyant et rond', '.' ]
+  ]).
+
+bouche(champagne_brut_reserve,
+  [ [ 'fine et elegante avec beaucoup de rondeur', '.' ]
+  ]).
+
+bouche(ch_paret_2012,
+  [ [ 'bouche dense riche et concentree avec grande maturite', '.' ]
+  ]).
+
+bouche(madiran_vieilles_vignes_2006,
+  [ [ 'tanins riches avec du gras pour un madiran puissant', '.' ]
+  ]).
+
+bouche(ch_du_moulin_neuf_prestige_2014,
+  [ [ 'belle maturite avec tannins murs et boise integre', '.' ]
+  ]).
+
+bouche(ch_milon_la_grave_particuliere_2012,
+  [ [ 'saveurs denses cremeuses et veloutees', '.' ]
+  ]).
+
+bouche(ch_roc_de_binet_2010,
+  [ [ 'vin riche dense avec tannins puissants enrobes', '.' ]
+  ]).
+
+bouche(ch_ruat_petit_poujeaux_2010,
+  [ [ 'saveurs charnues concentrees et onctueuses', '.' ]
+  ]).
+
+bouche(ch_les_polyanthas_2010,
+  [ [ 'style onctueux rond et soyeux avec profondeur', '.' ]
+  ]).
+
+bouche(ch_la_menotte_2012,
+  [ [ 'texture veloutee racee et harmonieuse', '.' ]
+  ]).
+
+bouche(la_fleur_de_pomys_2012,
+  [ [ 'saveurs riches concentrees avec grande densite', '.' ]
+  ]).
+
+bouche(pauillac_2011,
+  [ [ 'puissante aux tannins elegants et enrobes', '.' ]
+  ]).
+
+bouche(florilege_saint_julien_2010,
+  [ [ 'sensation concentree puissante et longue', '.' ]
+  ]).
+
+bouche(florilege_pomerol_2012,
+  [ [ 'saveurs riches intenses et veloutees', '.' ]
+  ]).
+
+bouche(cotes_du_rhone_villages_pierre_charlotte_2014,
+  [ [ 'attaque fruitee epicee puis nuance reglisse', '.' ],
+    [ 'finale fine et elegante', '.' ]
+  ]).
+
+bouche(tautavel_2014,
+  [ [ 'saveurs de fruits frais et epices avec grande concentration', '.' ]
+  ]).
+
+bouche(lirac_2015,
+  [ [ 'bouche dense et minerale avec fruits et epices', '.' ],
+    [ 'finale agreable souvenirs d aiguilles de pin', '.' ]
+  ]).
+
+bouche(cairanne_2014,
+  [ [ 'vin equilibre aux tannins soyeux', '.' ]
+  ]).
+
+bouche(vacqueyras_2014,
+  [ [ 'saveurs intenses juteuses denses et veloutees', '.' ]
+  ]).
+
+bouche(saint_joseph_2014,
+  [ [ 'vin aromatique race genereux concentre et puissant', '.' ],
+    [ 'belle harmonie gras fraicheur matiere', '.' ]
+  ]).
+
+bouche(gigondas_2014,
+  [ [ 'bouche racee fruits noirs epices finale distinguee', '.' ]
+  ]).
+
+bouche(chateauneuf_du_pape_rouge_2013,
+  [ [ 'saveurs intenses racees riches et complexes', '.' ]
+  ]).
+
+bouche(hermitage_rouge_2007,
+  [ [ 'bouche harmonieuse profonde sans durete', '.' ]
+  ]).
+
+bouche(bourgogne_pinot_noir_les_marnes_2014,
+  [ [ 'bourgogne fin et concentre genereux frais tendre et gourmand', '.' ]
+  ]).
+
+bouche(hautes_cotes_de_nuits_2014,
+  [ [ 'grain joli texture souple et bien enrobee', '.' ]
+  ]).
+
+bouche(savigny_les_beaune_2014,
+  [ [ 'bouche velours avec volume rondeur et touche moka', '.' ]
+  ]).
+
+bouche(savigny_les_beaune_premier_cru_2014,
+  [ [ 'attaque velours beau volume longueur et superbe gras', '.' ]
+  ]).
+
+bouche(aloxe_corton_2014,
+  [ [ 'saveurs corsees denses et concentrees', '.' ]
+  ]).
+
+bouche(chambolle_musigny_premier_cru_2012,
+  [ [ 'saveurs denses concentrees enrobees opulentes et puissantes', '.' ]
+  ]).
+
+bouche(chiroubles_2013,
+  [ [ 'sensation fruitee avec nuance florale et minerale', '.' ]
+  ]).
+
+bouche(fleurie_2015,
+  [ [ 'texture velours genereuse et harmonieuse', '.' ]
+  ]).
+
+bouche(moulin_a_vent_2014,
+  [ [ 'structure enrobee finale riche et harmonieuse', '.' ]
+  ]).
+
+bouche(chinon_vieilles_vignes_2014,
+  [ [ 'saveurs intenses structure volume race et concentration', '.' ]
+  ]).
+
+bouche(sancerre_rouge_2015,
+  [ [ 'notes de fruits et epices poivrees avec fraicheur et elegance', '.' ]
+  ]).
+
+bouche(les_guignards_2015,
+  [ [ 'vin expressif bien equilibre alliant fraicheur et tendresse', '.' ]
+  ]).
+
+bouche(chardonnay_exception_2016,
+  [ [ 'bouche epicee de caractere avec volume et finale ronde', '.' ]
+  ]).
+
+bouche(cotes_du_rhone_blanc_pierre_charlotte_2016,
+  [ [ 'bouche riche ronde fruitee avec touche boisee bien integree', '.' ]
+  ]).
+
+bouche(ch_le_druc_2015,
+  [ [ 'attaque juteuse alliant gras et fraicheur', '.' ]
+  ]).
+
+bouche(laudun_2016,
+  [ [ 'saveurs denses racees complexes finale persistante', '.' ]
+  ]).
+
+bouche(vouvray_blanc_sec_2016,
+  [ [ 'attaque genereuse puis expression minerale racee', '.' ]
+  ]).
+
+bouche(macon_villages_2015,
+  [ [ 'bouche equilibree alliant harmonie ampleur et elegance', '.' ]
+  ]).
+
+bouche(pinot_gris_2015,
+  [ [ 'bouche fruitee riche et elegante finale juteuse', '.' ]
+  ]).
+
+bouche(gewurztraminer_2015,
+  [ [ 'bouche genereuse equilibree et harmonieuse', '.' ]
+  ]).
+
+bouche(vire_clesse_2016,
+  [ [ 'saveurs fruitees minerales florales riches et expressives', '.' ]
+  ]).
+
+bouche(sancerre_blanc_verdigny_2015,
+  [ [ 'expression marie mineralite et fruit avec belle fraicheur', '.' ]
+  ]).
+
+bouche(vacqueyras_blanc_2016,
+  [ [ 'bouche pleine volume densite et longueur', '.' ]
+  ]).
+
+bouche(hautes_cotes_de_beaune_2015,
+  [ [ 'bouche intense genereuse riche et beurre avec boise integre', '.' ]
+  ]).
+
+bouche(pouilly_fuisse_2014,
+  [ [ 'bouche minerale assez puissante avec fruit gras et touche boisee', '.' ]
+  ]).
+
+bouche(chablis_premier_cru_montmains_2014,
+  [ [ 'saveurs complexes racees minerales salees et iodees', '.' ]
+  ]).
+
+bouche(condrieu_2015,
+  [ [ 'bouche alliant volume equilibre race mineralite et onctuosite', '.' ]
+  ]).
+
+bouche(cremant_de_loire_brut,
+  [ [ 'finesse et elegance avec beaucoup de rondeur', '.' ]
+  ]).
+
+bouche(champagne_extra_brut,
+  [ [ 'champagne tres digeste non dose pinot noir majoritaire', '.' ]
+  ]).
+
+bouche(champagne_brut_oeil_de_perdrix,
+  [ [ 'style race elegant croquant et gourmand', '.' ]
+  ]).
+
+bouche(champagne_brut_rose_de_saignee,
+  [ [ 'champagne croquant craquant gourmand et delicat', '.' ]
+  ]).
+
+bouche(champagne_brut_or_blanc,
+  [ [ 'equilibre fraicheur et onctuosite avec effervescence fougueuse', '.' ]
+  ]).
+
+bouche(champagne_brut_prestige,
+  [ [ 'finesse et puissance pour accompagner aperitif ou repas', '.' ]
+  ]).
+
+bouche(cognac_trois_etoiles,
+  [ [ 'style soyeux au tres beau fruit', '.' ]
+  ]).
+
+bouche(cognac_fine_champagne_vsop,
+  [ [ 'bouche elegante avec personalite et allure', '.' ]
+  ]).
+
+bouche(cognac_grande_champagne_hors_age,
+  [ [ 'bouche ample fruits confits pain d epices grande persistance', '.' ]
   ]).
 
 description(les_chaboeufs_2013,
@@ -166,27 +685,9 @@ description(beaumes_de_venise_2015,
     [ 'grand vin', '.' ]
   ]).
 
-nez(ch_moulin_de_mallet_2014,
-  [ [ nez, parfume, de, fruits, rouges, telles, que, cerise, et, mure, ',' ],
-    [ 'boise integre', '.' ]
-  ]).
-
-bouche(ch_moulin_de_mallet_2014,
-  [ [ 'tannins fins et bel equilibre avec une touche de boise', '.' ]
-  ]).
-
 description(ch_moulin_de_mallet_2014,
   [ [ 'robe grenat aux reflets rubis pour un bordeaux classique', '.' ],
     [ 'joli eventail aromatique et boise integre', '.' ]
-  ]).
-
-nez(ch_la_fleur_baudron_2014,
-  [ [ 'aromes de fruits compotes et epices fines', '.' ],
-    [ 'nuance florale', '.' ]
-  ]).
-
-bouche(ch_la_fleur_baudron_2014,
-  [ [ 'texture riche et plaisante avec des tannins soyeux', '.' ]
   ]).
 
 description(ch_la_fleur_baudron_2014,
@@ -194,25 +695,9 @@ description(ch_la_fleur_baudron_2014,
     [ 'bordeaux superieur complet et veloute', '.' ]
   ]).
 
-nez(ch_bois_vert_elegance_2014,
-  [ [ 'dominante de violette et cassis avec nuance empyreumatique', '.' ]
-  ]).
-
-bouche(ch_bois_vert_elegance_2014,
-  [ [ 'saveurs genereuses et rondes avec boise elegant', '.' ]
-  ]).
-
 description(ch_bois_vert_elegance_2014,
   [ [ 'appellation cotes de bordeaux blaye appreciee pour la souplesse des vins', '.' ],
     [ 'vin veloute et harmonieux', '.' ]
-  ]).
-
-nez(ch_menota_cuvee_montagrede_2014,
-  [ [ 'fruits noirs et epices avec nuances empyreumatiques', '.' ]
-  ]).
-
-bouche(ch_menota_cuvee_montagrede_2014,
-  [ [ 'texture ronde et veloutee aux tannins soyeux', '.' ]
   ]).
 
 description(ch_menota_cuvee_montagrede_2014,
@@ -220,25 +705,9 @@ description(ch_menota_cuvee_montagrede_2014,
     [ 'finale cacaotee et equilibre remarquable', '.' ]
   ]).
 
-nez(syrah_2015_vin_de_pays_doc,
-  [ [ 'fruits rouges et agrumes avec notes epicees', '.' ]
-  ]).
-
-bouche(syrah_2015_vin_de_pays_doc,
-  [ [ 'caractere enrobe de fruits rouges et nuance de reglisse', '.' ]
-  ]).
-
 description(syrah_2015_vin_de_pays_doc,
   [ [ 'elevage sous bois de douze mois pour fondre les tannins', '.' ],
     [ 'vin harmonieux et charmeur', '.' ]
-  ]).
-
-nez(coteaux_bourguignons_2014,
-  [ [ 'aromes de cerise associes a des nuances florales', '.' ]
-  ]).
-
-bouche(coteaux_bourguignons_2014,
-  [ [ 'saveurs juteuses dans un style gouleyant et rond', '.' ]
   ]).
 
 description(coteaux_bourguignons_2014,
@@ -246,25 +715,9 @@ description(coteaux_bourguignons_2014,
     [ 'a boire entre 2017 et 2020', '.' ]
   ]).
 
-nez(champagne_brut_reserve,
-  [ [ 'nez complexe harmonieux et delicat', '.' ]
-  ]).
-
-bouche(champagne_brut_reserve,
-  [ [ 'fine et elegante avec beaucoup de rondeur', '.' ]
-  ]).
-
 description(champagne_brut_reserve,
   [ [ 'champagne de ceremonie souple et delicat', '.' ],
     [ 'cuvee de tradition de la maison vesselle a bouzy', '.' ]
-  ]).
-
-nez(ch_paret_2012,
-  [ [ 'nez profond avec fruits noirs chocolat et sous bois', '.' ]
-  ]).
-
-bouche(ch_paret_2012,
-  [ [ 'bouche dense riche et concentree avec grande maturite', '.' ]
   ]).
 
 description(ch_paret_2012,
@@ -272,25 +725,9 @@ description(ch_paret_2012,
     [ 'vin complet de castillon au beau caractere', '.' ]
   ]).
 
-nez(madiran_vieilles_vignes_2006,
-  [ [ 'notes de fruits noirs avec touche cacao', '.' ]
-  ]).
-
-bouche(madiran_vieilles_vignes_2006,
-  [ [ 'tanins riches avec du gras pour un madiran puissant', '.' ]
-  ]).
-
 description(madiran_vieilles_vignes_2006,
   [ [ 'cepage tannat charpente mais sans austere', '.' ],
     [ 'accompagne des plats forts en gout', '.' ]
-  ]).
-
-nez(ch_du_moulin_neuf_prestige_2014,
-  [ [ 'fruits noirs confitures avec notes fumees et chocolatees', '.' ]
-  ]).
-
-bouche(ch_du_moulin_neuf_prestige_2014,
-  [ [ 'belle maturite avec tannins murs et boise integre', '.' ]
   ]).
 
 description(ch_du_moulin_neuf_prestige_2014,
@@ -298,25 +735,9 @@ description(ch_du_moulin_neuf_prestige_2014,
     [ 'dominance cabernet reussie en medoc 2014', '.' ]
   ]).
 
-nez(ch_milon_la_grave_particuliere_2012,
-  [ [ 'fruits rouges violette et nuances empyreumatiques', '.' ]
-  ]).
-
-bouche(ch_milon_la_grave_particuliere_2012,
-  [ [ 'saveurs denses cremeuses et veloutees', '.' ]
-  ]).
-
 description(ch_milon_la_grave_particuliere_2012,
   [ [ 'cuvee presque exclusivement merlot style veloute', '.' ],
     [ 'finale distinguee savoureuse', '.' ]
-  ]).
-
-nez(ch_roc_de_binet_2010,
-  [ [ 'cassis cerise violette et truffe', '.' ]
-  ]).
-
-bouche(ch_roc_de_binet_2010,
-  [ [ 'vin riche dense avec tannins puissants enrobes', '.' ]
   ]).
 
 description(ch_roc_de_binet_2010,
@@ -324,25 +745,9 @@ description(ch_roc_de_binet_2010,
     [ 'sensations de richesse et d etoffe', '.' ]
   ]).
 
-nez(ch_ruat_petit_poujeaux_2010,
-  [ [ 'bouquet intense de fruits noirs avec nuances torrefiees', '.' ]
-  ]).
-
-bouche(ch_ruat_petit_poujeaux_2010,
-  [ [ 'saveurs charnues concentrees et onctueuses', '.' ]
-  ]).
-
 description(ch_ruat_petit_poujeaux_2010,
   [ [ 'terroir de fines graves blanches type haut medoc', '.' ],
     [ 'finale longue et distinguee', '.' ]
-  ]).
-
-nez(ch_les_polyanthas_2010,
-  [ [ 'aromes truffes fruites et epices', '.' ]
-  ]).
-
-bouche(ch_les_polyanthas_2010,
-  [ [ 'style onctueux rond et soyeux avec profondeur', '.' ]
   ]).
 
 description(ch_les_polyanthas_2010,
@@ -350,25 +755,9 @@ description(ch_les_polyanthas_2010,
     [ 'saint emilion de grande classe', '.' ]
   ]).
 
-nez(ch_la_menotte_2012,
-  [ [ 'bouquet intense fruits fleurs nuances truffees et cafe', '.' ]
-  ]).
-
-bouche(ch_la_menotte_2012,
-  [ [ 'texture veloutee racee et harmonieuse', '.' ]
-  ]).
-
 description(ch_la_menotte_2012,
   [ [ 'lalande de pomerol au charme et a l etoffe', '.' ],
     [ 'tres present tout au long de la bouche', '.' ]
-  ]).
-
-nez(la_fleur_de_pomys_2012,
-  [ [ 'nez empyreumatique myrtille cassis et boise integre', '.' ]
-  ]).
-
-bouche(la_fleur_de_pomys_2012,
-  [ [ 'saveurs riches concentrees avec grande densite', '.' ]
   ]).
 
 description(la_fleur_de_pomys_2012,
@@ -376,25 +765,9 @@ description(la_fleur_de_pomys_2012,
     [ 'vin complet dense et race', '.' ]
   ]).
 
-nez(pauillac_2011,
-  [ [ 'fruits noirs avec touche bois de vigne et reglisse', '.' ]
-  ]).
-
-bouche(pauillac_2011,
-  [ [ 'puissante aux tannins elegants et enrobes', '.' ]
-  ]).
-
 description(pauillac_2011,
   [ [ 'florilege grand bordeaux profond et distingue', '.' ],
     [ 'compagnon ideal des plats de gibier', '.' ]
-  ]).
-
-nez(florilege_saint_julien_2010,
-  [ [ 'nez dense cremeux avec trame tannique enrobee', '.' ]
-  ]).
-
-bouche(florilege_saint_julien_2010,
-  [ [ 'sensation concentree puissante et longue', '.' ]
   ]).
 
 description(florilege_saint_julien_2010,
@@ -402,27 +775,9 @@ description(florilege_saint_julien_2010,
     [ 'vin de present et d avenir', '.' ]
   ]).
 
-nez(florilege_pomerol_2012,
-  [ [ 'dominante de fruits rouges avec nuances torrefiees et epicees', '.' ]
-  ]).
-
-bouche(florilege_pomerol_2012,
-  [ [ 'saveurs riches intenses et veloutees', '.' ]
-  ]).
-
 description(florilege_pomerol_2012,
   [ [ 'terroir argile fer rugineuse specifique de pomerol', '.' ],
     [ 'ensemble cremeux dense et concentre', '.' ]
-  ]).
-
-nez(cotes_du_rhone_villages_pierre_charlotte_2014,
-  [ [ 'bouquet charmant fruits rouges mures et fruits a noyau', ',' ],
-    [ 'nuances de garrigue bois de cedre et agrumes', '.' ]
-  ]).
-
-bouche(cotes_du_rhone_villages_pierre_charlotte_2014,
-  [ [ 'attaque fruitee epicee puis nuance reglisse', '.' ],
-    [ 'finale fine et elegante', '.' ]
   ]).
 
 description(cotes_du_rhone_villages_pierre_charlotte_2014,
@@ -430,26 +785,9 @@ description(cotes_du_rhone_villages_pierre_charlotte_2014,
     [ 'cotes du rhone villages de charme', '.' ]
   ]).
 
-nez(tautavel_2014,
-  [ [ 'fruits noirs epices chocolat et garrigue', '.' ]
-  ]).
-
-bouche(tautavel_2014,
-  [ [ 'saveurs de fruits frais et epices avec grande concentration', '.' ]
-  ]).
-
 description(tautavel_2014,
   [ [ 'cotes du roussillon villages a la finale cacao dense', '.' ],
     [ 'puissant juteux et harmonieux', '.' ]
-  ]).
-
-nez(lirac_2015,
-  [ [ 'fruits a noyaux et epices cannelle reglisse', '.' ]
-  ]).
-
-bouche(lirac_2015,
-  [ [ 'bouche dense et minerale avec fruits et epices', '.' ],
-    [ 'finale agreable souvenirs d aiguilles de pin', '.' ]
   ]).
 
 description(lirac_2015,
@@ -457,25 +795,9 @@ description(lirac_2015,
     [ 'grande annee au souvenir tres plaisant', '.' ]
   ]).
 
-nez(cairanne_2014,
-  [ [ 'aromes tres expressifs guimauve genevrier et tabac', '.' ]
-  ]).
-
-bouche(cairanne_2014,
-  [ [ 'vin equilibre aux tannins soyeux', '.' ]
-  ]).
-
 description(cairanne_2014,
   [ [ 'terroir en altitude a cote de rasteau', '.' ],
     [ 'finale de caractere et persistance', '.' ]
-  ]).
-
-nez(vacqueyras_2014,
-  [ [ 'nez aromatique fruits surmuris guimauve reglisse', '.' ]
-  ]).
-
-bouche(vacqueyras_2014,
-  [ [ 'saveurs intenses juteuses denses et veloutees', '.' ]
   ]).
 
 description(vacqueyras_2014,
@@ -483,25 +805,8 @@ description(vacqueyras_2014,
     [ 'cru plaisant et elegant', '.' ]
   ]).
 
-nez(saint_joseph_2014,
-  [ [ 'syrah nord fruits pamplemousse epices poivre et bois brule', '.' ]
-  ]).
-
-bouche(saint_joseph_2014,
-  [ [ 'vin aromatique race genereux concentre et puissant', '.' ],
-    [ 'belle harmonie gras fraicheur matiere', '.' ]
-  ]).
-
 description(saint_joseph_2014,
   [ [ 'equilibre remarquable pour ce saint joseph', '.' ]
-  ]).
-
-nez(gigondas_2014,
-  [ [ 'nez riche et concentre avec fond remarquable', '.' ]
-  ]).
-
-bouche(gigondas_2014,
-  [ [ 'bouche racee fruits noirs epices finale distinguee', '.' ]
   ]).
 
 description(gigondas_2014,
@@ -509,37 +814,13 @@ description(gigondas_2014,
     [ 'terroir caillouteux donnant un vin elegant', '.' ]
   ]).
 
-nez(chateauneuf_du_pape_rouge_2013,
-  [ [ 'nez complexe suave fruits rouges cannelle et epices', '.' ]
-  ]).
-
-bouche(chateauneuf_du_pape_rouge_2013,
-  [ [ 'saveurs intenses racees riches et complexes', '.' ]
-  ]).
-
 description(chateauneuf_du_pape_rouge_2013,
   [ [ 'terrasses de galets roules produisant des vins charnus', '.' ],
     [ 'chateauneuf complet et harmonieux', '.' ]
   ]).
 
-nez(hermitage_rouge_2007,
-  [ [ 'fruits noirs agrumes vanille tabac et reglisse', '.' ]
-  ]).
-
-bouche(hermitage_rouge_2007,
-  [ [ 'bouche harmonieuse profonde sans durete', '.' ]
-  ]).
-
 description(hermitage_rouge_2007,
   [ [ 'grand vin race et complexe qui s epanouit', '.' ]
-  ]).
-
-nez(bourgogne_pinot_noir_les_marnes_2014,
-  [ [ 'parfum de griottes et fruits des bois avec notes epicees', '.' ]
-  ]).
-
-bouche(bourgogne_pinot_noir_les_marnes_2014,
-  [ [ 'bourgogne fin et concentre genereux frais tendre et gourmand', '.' ]
   ]).
 
 description(bourgogne_pinot_noir_les_marnes_2014,
@@ -547,36 +828,12 @@ description(bourgogne_pinot_noir_les_marnes_2014,
     [ 'vin polyvalent', '.' ]
   ]).
 
-nez(hautes_cotes_de_nuits_2014,
-  [ [ 'nez expressif fruits rouges groseilles griottes nuances florales', '.' ]
-  ]).
-
-bouche(hautes_cotes_de_nuits_2014,
-  [ [ 'grain joli texture souple et bien enrobee', '.' ]
-  ]).
-
 description(hautes_cotes_de_nuits_2014,
   [ [ 'plateau en altitude apportant finesse et personnalite', '.' ]
   ]).
 
-nez(savigny_les_beaune_2014,
-  [ [ 'nez intense charmeur de fruits murs et pain d epice', '.' ]
-  ]).
-
-bouche(savigny_les_beaune_2014,
-  [ [ 'bouche velours avec volume rondeur et touche moka', '.' ]
-  ]).
-
 description(savigny_les_beaune_2014,
   [ [ 'savigny delicieux a boire entre 2017 et 2022', '.' ]
-  ]).
-
-nez(savigny_les_beaune_premier_cru_2014,
-  [ [ 'nez gourmand fruits rouges encens et grain de cafe', '.' ]
-  ]).
-
-bouche(savigny_les_beaune_premier_cru_2014,
-  [ [ 'attaque velours beau volume longueur et superbe gras', '.' ]
   ]).
 
 description(savigny_les_beaune_premier_cru_2014,
@@ -584,24 +841,8 @@ description(savigny_les_beaune_premier_cru_2014,
     [ 'toute la classe d un premier cru', '.' ]
   ]).
 
-nez(aloxe_corton_2014,
-  [ [ 'intensite aromatique grotte sous bois grain de cafe et epices', '.' ]
-  ]).
-
-bouche(aloxe_corton_2014,
-  [ [ 'saveurs corsees denses et concentrees', '.' ]
-  ]).
-
 description(aloxe_corton_2014,
   [ [ 'splendide aloxe laissant excellent souvenir', '.' ]
-  ]).
-
-nez(chambolle_musigny_premier_cru_2012,
-  [ [ 'fruits rouges epices poivre nuances empyreumatiques et sous bois', '.' ]
-  ]).
-
-bouche(chambolle_musigny_premier_cru_2012,
-  [ [ 'saveurs denses concentrees enrobees opulentes et puissantes', '.' ]
   ]).
 
 description(chambolle_musigny_premier_cru_2012,
@@ -609,49 +850,17 @@ description(chambolle_musigny_premier_cru_2012,
     [ 'grand vin race et long', '.' ]
   ]).
 
-nez(chiroubles_2013,
-  [ [ 'fruits rouges groseilles fraises et epices', '.' ]
-  ]).
-
-bouche(chiroubles_2013,
-  [ [ 'sensation fruitee avec nuance florale et minerale', '.' ]
-  ]).
-
 description(chiroubles_2013,
   [ [ 'terroir granitique et schisteux du beaujolais', '.' ],
     [ 'vin tendre et expressif', '.' ]
-  ]).
-
-nez(fleurie_2015,
-  [ [ 'nez elegant melant fruit epices et nuances florales', '.' ]
-  ]).
-
-bouche(fleurie_2015,
-  [ [ 'texture velours genereuse et harmonieuse', '.' ]
   ]).
 
 description(fleurie_2015,
   [ [ 'reine des crus du beaujolais grand millesime coup de coeur', '.' ]
   ]).
 
-nez(moulin_a_vent_2014,
-  [ [ 'fruits sauvages grotte sous bois et nuance de cire', '.' ]
-  ]).
-
-bouche(moulin_a_vent_2014,
-  [ [ 'structure enrobee finale riche et harmonieuse', '.' ]
-  ]).
-
 description(moulin_a_vent_2014,
   [ [ 'terroir donnant des gamay vineux tres concentres', '.' ]
-  ]).
-
-nez(chinon_vieilles_vignes_2014,
-  [ [ 'cabernet franc mur reglisse noire vanille fruits rouges et sous bois', '.' ]
-  ]).
-
-bouche(chinon_vieilles_vignes_2014,
-  [ [ 'saveurs intenses structure volume race et concentration', '.' ]
   ]).
 
 description(chinon_vieilles_vignes_2014,
@@ -659,24 +868,8 @@ description(chinon_vieilles_vignes_2014,
     [ 'vin gastronomique', '.' ]
   ]).
 
-nez(sancerre_rouge_2015,
-  [ [ 'nez pinot cerise fruits des bois sous bois champignons', '.' ]
-  ]).
-
-bouche(sancerre_rouge_2015,
-  [ [ 'notes de fruits et epices poivrees avec fraicheur et elegance', '.' ]
-  ]).
-
 description(sancerre_rouge_2015,
   [ [ 'vin rond ample souple et soyeux finale harmonieuse', '.' ]
-  ]).
-
-nez(les_guignards_2015,
-  [ [ 'cassis et fruits du verger avec nuances d agrumes et de rose', '.' ]
-  ]).
-
-bouche(les_guignards_2015,
-  [ [ 'vin expressif bien equilibre alliant fraicheur et tendresse', '.' ]
   ]).
 
 description(les_guignards_2015,
@@ -684,25 +877,9 @@ description(les_guignards_2015,
     [ 'vin polyvalent delicieux', '.' ]
   ]).
 
-nez(chardonnay_exception_2016,
-  [ [ 'aromes intenses de fruits du verger avec touche boisee', '.' ]
-  ]).
-
-bouche(chardonnay_exception_2016,
-  [ [ 'bouche epicee de caractere avec volume et finale ronde', '.' ]
-  ]).
-
 description(chardonnay_exception_2016,
   [ [ 'vin puissant laissant un excellent souvenir', '.' ],
     [ 'note boisee tout au long de la degustation', '.' ]
-  ]).
-
-nez(cotes_du_rhone_blanc_pierre_charlotte_2016,
-  [ [ 'abricot et peche blanche avec nuances de fruits secs et epices', '.' ]
-  ]).
-
-bouche(cotes_du_rhone_blanc_pierre_charlotte_2016,
-  [ [ 'bouche riche ronde fruitee avec touche boisee bien integree', '.' ]
   ]).
 
 description(cotes_du_rhone_blanc_pierre_charlotte_2016,
@@ -710,25 +887,9 @@ description(cotes_du_rhone_blanc_pierre_charlotte_2016,
     [ 'maitre achat frais et gourmand', '.' ]
   ]).
 
-nez(ch_le_druc_2015,
-  [ [ 'nez expressif d abricot agrumes et nuances florales grillees', '.' ]
-  ]).
-
-bouche(ch_le_druc_2015,
-  [ [ 'attaque juteuse alliant gras et fraicheur', '.' ]
-  ]).
-
 description(ch_le_druc_2015,
   [ [ 'graves blanc au boise empyreumatique', '.' ],
     [ 'excellent rapport qualite prix', '.' ]
-  ]).
-
-nez(laudun_2016,
-  [ [ 'nez intense fruits du verger epices et note citronnee', '.' ]
-  ]).
-
-bouche(laudun_2016,
-  [ [ 'saveurs denses racees complexes finale persistante', '.' ]
   ]).
 
 description(laudun_2016,
@@ -736,48 +897,16 @@ description(laudun_2016,
     [ 'magnifique decouverte alluree', '.' ]
   ]).
 
-nez(vouvray_blanc_sec_2016,
-  [ [ 'aromes de chenin tilleul et nuance de rose', '.' ]
-  ]).
-
-bouche(vouvray_blanc_sec_2016,
-  [ [ 'attaque genereuse puis expression minerale racee', '.' ]
-  ]).
-
 description(vouvray_blanc_sec_2016,
   [ [ 'vin de caractere tres elegant', '.' ]
-  ]).
-
-nez(macon_villages_2015,
-  [ [ 'fruits pomme et coing avec notes de beurre et miel', '.' ]
-  ]).
-
-bouche(macon_villages_2015,
-  [ [ 'bouche equilibree alliant harmonie ampleur et elegance', '.' ]
   ]).
 
 description(macon_villages_2015,
   [ [ 'chardonnay de macon bourgogne blanc plaisant', '.' ]
   ]).
 
-nez(pinot_gris_2015,
-  [ [ 'nez parfume de fruits frais a chair blanche et exotiques', '.' ]
-  ]).
-
-bouche(pinot_gris_2015,
-  [ [ 'bouche fruitee riche et elegante finale juteuse', '.' ]
-  ]).
-
 description(pinot_gris_2015,
   [ [ 'pinot gris plein de charme', '.' ]
-  ]).
-
-nez(gewurztraminer_2015,
-  [ [ 'fruits a chair blanche et exotiques avec fleurs et epices', '.' ]
-  ]).
-
-bouche(gewurztraminer_2015,
-  [ [ 'bouche genereuse equilibree et harmonieuse', '.' ]
   ]).
 
 description(gewurztraminer_2015,
@@ -785,38 +914,13 @@ description(gewurztraminer_2015,
     [ 'finale distinguee', '.' ]
   ]).
 
-nez(vire_clesse_2016,
-  [ [ 'aromes intenses de pomme coing peche et miel', '.' ]
-  ]).
-
-bouche(vire_clesse_2016,
-  [ [ 'saveurs fruitees minerales florales riches et expressives', '.' ]
-  ]).
-
 description(vire_clesse_2016,
   [ [ 'chardonnay maconnais alliant texture ronde et fraicheur', '.' ],
     [ 'vin race complexe et concentre', '.' ]
   ]).
 
-nez(sancerre_blanc_verdigny_2015,
-  [ [ 'nez race minéral avec fruits murs cassis eglantier et buis', '.' ]
-  ]).
-
-bouche(sancerre_blanc_verdigny_2015,
-  [ [ 'expression marie mineralite et fruit avec belle fraicheur', '.' ]
-  ]).
-
 description(sancerre_blanc_verdigny_2015,
   [ [ 'grand classique du sauvignon sur terroir calcaire de verdigny', '.' ]
-  ]).
-
-nez(vacqueyras_blanc_2016,
-  [ [ 'intensite aromatique abricot peche blanche raisin frais et poire', ',' ],
-    [ 'nuances epicees pain grille et thym', '.' ]
-  ]).
-
-bouche(vacqueyras_blanc_2016,
-  [ [ 'bouche pleine volume densite et longueur', '.' ]
   ]).
 
 description(vacqueyras_blanc_2016,
@@ -824,49 +928,17 @@ description(vacqueyras_blanc_2016,
     [ 'rarete delicieuse de vacqueyras blanc', '.' ]
   ]).
 
-nez(hautes_cotes_de_beaune_2015,
-  [ [ 'nez parfume fleurs blanches fruits du verger et noisettes', '.' ]
-  ]).
-
-bouche(hautes_cotes_de_beaune_2015,
-  [ [ 'bouche intense genereuse riche et beurre avec boise integre', '.' ]
-  ]).
-
 description(hautes_cotes_de_beaune_2015,
   [ [ 'bourgogne gastronomique sur les hauteurs de la cote de beaune', '.' ],
     [ 'excellent rapport plaisir prix', '.' ]
-  ]).
-
-nez(pouilly_fuisse_2014,
-  [ [ 'nez mineral elegant notes de coing pomme noisette grillee et beurre', '.' ]
-  ]).
-
-bouche(pouilly_fuisse_2014,
-  [ [ 'bouche minerale assez puissante avec fruit gras et touche boisee', '.' ]
   ]).
 
 description(pouilly_fuisse_2014,
   [ [ 'grand classique pour crustaces et poissons en sauce', '.' ]
   ]).
 
-nez(chablis_premier_cru_montmains_2014,
-  [ [ 'nez intense de fruits du verger avec nuances iodees et noisettees', '.' ]
-  ]).
-
-bouche(chablis_premier_cru_montmains_2014,
-  [ [ 'saveurs complexes racees minerales salees et iodees', '.' ]
-  ]).
-
 description(chablis_premier_cru_montmains_2014,
   [ [ 'chablis premier cru tres race grande longueur', '.' ]
-  ]).
-
-nez(condrieu_2015,
-  [ [ 'intensite aromatique riche abricot peche et epices', '.' ]
-  ]).
-
-bouche(condrieu_2015,
-  [ [ 'bouche alliant volume equilibre race mineralite et onctuosite', '.' ]
   ]).
 
 description(condrieu_2015,
@@ -874,37 +946,13 @@ description(condrieu_2015,
     [ 'exposition parfaite pour 1.8 hectares', '.' ]
   ]).
 
-nez(cremant_de_loire_brut,
-  [ [ 'nez associant rondeur du chardonnay et caractere floral du chenin', '.' ]
-  ]).
-
-bouche(cremant_de_loire_brut,
-  [ [ 'finesse et elegance avec beaucoup de rondeur', '.' ]
-  ]).
-
 description(cremant_de_loire_brut,
   [ [ 'methode traditionnelle vendanges manuelles', '.' ],
     [ 'cremant de loire tres digeste', '.' ]
   ]).
 
-nez(champagne_extra_brut,
-  [ [ 'nez de finesse et d elegance a l etat pur', '.' ]
-  ]).
-
-bouche(champagne_extra_brut,
-  [ [ 'champagne tres digeste non dose pinot noir majoritaire', '.' ]
-  ]).
-
 description(champagne_extra_brut,
   [ [ 'champagne d aperitif superbe de finesse', '.' ]
-  ]).
-
-nez(champagne_brut_oeil_de_perdrix,
-  [ [ 'notes de fruits rouges cerise et framboise avec sous bois', '.' ]
-  ]).
-
-bouche(champagne_brut_oeil_de_perdrix,
-  [ [ 'style race elegant croquant et gourmand', '.' ]
   ]).
 
 description(champagne_brut_oeil_de_perdrix,
@@ -912,24 +960,8 @@ description(champagne_brut_oeil_de_perdrix,
     [ 'rarete a grande intensite aromatique', '.' ]
   ]).
 
-nez(champagne_brut_rose_de_saignee,
-  [ [ 'notes de fruits rouges cerise petite framboise et sous bois', '.' ]
-  ]).
-
-bouche(champagne_brut_rose_de_saignee,
-  [ [ 'champagne croquant craquant gourmand et delicat', '.' ]
-  ]).
-
 description(champagne_brut_rose_de_saignee,
   [ [ 'rose de saignee rare au style race et elegant', '.' ]
-  ]).
-
-nez(champagne_brut_or_blanc,
-  [ [ 'chardonnay mur sur notes de fleur d acacia citron et peche blanche', '.' ]
-  ]).
-
-bouche(champagne_brut_or_blanc,
-  [ [ 'equilibre fraicheur et onctuosite avec effervescence fougueuse', '.' ]
   ]).
 
 description(champagne_brut_or_blanc,
@@ -937,52 +969,19 @@ description(champagne_brut_or_blanc,
     [ 'champagne pour toutes les occasions', '.' ]
   ]).
 
-nez(champagne_brut_prestige,
-  [ [ 'nez complexe puissant evolue fruits secs et miel', '.' ]
-  ]).
-
-bouche(champagne_brut_prestige,
-  [ [ 'finesse et puissance pour accompagner aperitif ou repas', '.' ]
-  ]).
-
 description(champagne_brut_prestige,
   [ [ 'cuvee grand cru bouzy remarquable', '.' ]
-  ]).
-
-nez(cognac_trois_etoiles,
-  [ [ 'belle intensite de fruit avec epices et ecorce d orange', '.' ]
-  ]).
-
-bouche(cognac_trois_etoiles,
-  [ [ 'style soyeux au tres beau fruit', '.' ]
   ]).
 
 description(cognac_trois_etoiles,
   [ [ 'assemblage de petite champagne fin bois et bon bois', '.' ]
   ]).
 
-nez(cognac_fine_champagne_vsop,
-  [ [ 'nez puissant avec beaucoup de finesse', '.' ]
-  ]).
-
-bouche(cognac_fine_champagne_vsop,
-  [ [ 'bouche elegante avec personalite et allure', '.' ]
-  ]).
-
 description(cognac_fine_champagne_vsop,
   [ [ 'assemblage grande et petite champagne mention fine champagne', '.' ]
-  ]).
-
-nez(cognac_grande_champagne_hors_age,
-  [ [ 'nez intense complexe et tres fin', '.' ]
-  ]).
-
-bouche(cognac_grande_champagne_hors_age,
-  [ [ 'bouche ample fruits confits pain d epices grande persistance', '.' ]
   ]).
 
 description(cognac_grande_champagne_hors_age,
   [ [ 'hors age issu de la meilleure aire grande champagne', '.' ],
     [ 'inclut une eau de vie des annees cinquante', '.' ]
   ]).
-
