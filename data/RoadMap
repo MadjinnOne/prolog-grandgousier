@@ -157,7 +157,7 @@ Livrables
 Tests
 
 * « Auriez-vous des vins entre 20 et 35 EUR ? »
-* « Des vins à moins de 15 ? », « à plus de 40 ? »
+* « Des vins à moins de 15 EUR ?  », « Des vins à plus de 40 EUR ? »
 
 ## 9) Continuité: “d’autres vins de Bourgogne”
 
@@ -177,7 +177,7 @@ Livrables
 Tests
 
 * 1. demander Bourgogne → liste 1
-* 2. demander “d’autres” → liste 2 différente
+* 2. dm→ liste 2 différente
 
 ## 10) Accord mets-vins: “je cuisine du canard, quel vin…”
 

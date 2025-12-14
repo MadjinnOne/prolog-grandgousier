@@ -78,7 +78,8 @@ prefixrem([H|T],[H|L],Lr) :- prefixrem(T,L,Lr).
 normaliser_question(Lmots,L_out) :-
    nom_vins_uniforme(Lmots,Ltmp),
    normaliser_appellations_tokens(Ltmp,Lapp),
-   maplist(normaliser_mot,Lapp,L_out).
+   normaliser_plats_tokens(Lapp,Lplats),
+   maplist(normaliser_mot,Lplats,L_out).
 
 normaliser_mots_clefs(Lin,Lout) :-
     maplist(normaliser_mot,Lin,Lout).
@@ -107,6 +108,49 @@ remplace_appellations([app(App,Pattern)|Rest],Lin,Lout) :-
    replace_vin(Pattern,App,Lin,Linter),
    remplace_appellations(Rest,Linter,Lout).
 
+normaliser_plats_tokens(Lin,Lout) :-
+   findall(Key-plat(Plat,Pattern),
+      ( plat_synonyme(Plat,Pattern),
+        length(Pattern,Len),
+        Key is -Len
+      ),
+      Raw),
+   keysort(Raw,Sorted),
+   pairs_values(Sorted,Variants),
+   remplace_plats(Variants,Lin,Lout).
+
+remplace_plats([],L,L).
+remplace_plats([plat(Plat,Pattern)|Rest],Lin,Lout) :-
+   replace_vin(Pattern,Plat,Lin,Linter),
+   remplace_plats(Rest,Linter,Lout).
+
+plat_synonyme(canard,[canard]).
+plat_synonyme(boeuf,[boeuf]).
+plat_synonyme(poisson,[poisson]).
+plat_synonyme(boulets_liegeois,[boulets,liegeois]).
+plat_synonyme(boulets_liegeois,[boulet,liegeois]).
+plat_synonyme(boulets_liegeois,[boulets]).
+plat_synonyme(carbonnade,[carbonnade]).
+plat_synonyme(carbonnade,[carbonnades]).
+plat_synonyme(carbonnade,[carbonnade,flamande]).
+plat_synonyme(stoemp_saucisse,[stoemp,saucisse]).
+plat_synonyme(stoemp_saucisse,[stoemp]).
+plat_synonyme(stoemp_saucisse,[stoemp,et,saucisse]).
+plat_synonyme(lapin_a_la_biere,[lapin,a,la,biere]).
+plat_synonyme(lapin_a_la_biere,[lapin,biere]).
+plat_synonyme(potee_liegeoise,[potee,liegeoise]).
+plat_synonyme(potee_liegeoise,[potee]).
+plat_synonyme(chicons_au_gratin,[chicons,au,gratin]).
+plat_synonyme(chicons_au_gratin,[chicon,gratin]).
+plat_synonyme(boudin_noir_aux_pommes,[boudin,noir,aux,pommes]).
+plat_synonyme(boudin_noir_aux_pommes,[boudin,noir]).
+plat_synonyme(filet_americain,[filet,americain]).
+plat_synonyme(filet_americain,[filet]).
+plat_synonyme(vol_au_vent,[vol,au,vent]).
+plat_synonyme(vol_au_vent,[volauvent]).
+plat_synonyme(tarte_al_djote,[tarte,al,djote]).
+plat_synonyme(tarte_al_djote,[tarte,djote]).
+plat_synonyme(waterzooi,[waterzooi]).
 appellation_synonymes(App,Syns) :-
    ( var(App)
    -> setof(A, source_appellation(A), Apps), member(App,Apps)
@@ -209,13 +253,42 @@ mclef(quel,9).
 mclef(bourgogne,9).
 mclef(dautres,7).
 mclef(autres,7).
+mclef(auriez,6).
 mclef(moins,7).
 mclef(plus,7).
+mclef(boeuf,8).
+mclef(poisson,8).
 mclef(canard,8).
+mclef(boulets_liegeois,7).
+mclef(carbonnade,7).
+mclef(stoemp_saucisse,7).
+mclef(lapin_a_la_biere,7).
+mclef(potee_liegeoise,7).
+mclef(chicons_au_gratin,7).
+mclef(boudin_noir_aux_pommes,7).
+mclef(filet_americain,7).
+mclef(vol_au_vent,7).
+mclef(tarte_al_djote,6).
+mclef(waterzooi,7).
 mclef(parlez,2).
 mclef(parle,2).
 mclef(parlezvous,2).
 mclef(appellation,8).
+
+plat_kw(canard,canard).
+plat_kw(boeuf,boeuf).
+plat_kw(poisson,poisson).
+plat_kw(boulets_liegeois,boulets_liegeois).
+plat_kw(carbonnade,carbonnade).
+plat_kw(stoemp_saucisse,stoemp_saucisse).
+plat_kw(lapin_a_la_biere,lapin_a_la_biere).
+plat_kw(potee_liegeoise,potee_liegeoise).
+plat_kw(chicons_au_gratin,chicons_au_gratin).
+plat_kw(boudin_noir_aux_pommes,boudin_noir_aux_pommes).
+plat_kw(filet_americain,filet_americain).
+plat_kw(vol_au_vent,vol_au_vent).
+plat_kw(tarte_al_djote,tarte_al_djote).
+plat_kw(waterzooi,waterzooi).
 
 
 % ----------------------------------------------------------------%
@@ -278,37 +351,44 @@ regle_rep(nez,5,
 regle_rep(pourriezvous, 1,
   [ pourriezvous, men, dire, plus, sur, le, Vin ],
   Rep ) :-
-    description(Vin, Rep).
+    description_ou_appellation(Vin, Rep).
 
 regle_rep(pourriezvous, 2,
   [ pourriezvous, men, dire, plus, sur, Vin ],
   Rep ) :-
-    description(Vin, Rep).
+    description_ou_appellation(Vin, Rep).
 
 regle_rep(que,1,
   [ que, pouvezvous, me, dire, sur, le, Vin ],
   Rep) :-
-    description(Vin,Rep).
+    description_ou_appellation(Vin,Rep).
 
 regle_rep(parlez,1,
   [ parlez, moi, du, Vin ],
   Rep) :-
-    description(Vin,Rep).
+    description_ou_appellation(Vin,Rep).
 
 regle_rep(parlez,2,
   [ parlez, moi, de, Vin ],
   Rep) :-
-    description(Vin,Rep).
+    description_ou_appellation(Vin,Rep).
 
 regle_rep(parle,1,
   [ parle, moi, du, Vin ],
   Rep) :-
-    description(Vin,Rep).
+    description_ou_appellation(Vin,Rep).
 
 regle_rep(parlezvous,1,
   [ parlezvous, du, Vin ],
   Rep) :-
-    description(Vin,Rep).
+    description_ou_appellation(Vin,Rep).
+
+description_ou_appellation(Vin,Rep) :-
+    description(Vin,Rep), !.
+description_ou_appellation(App,Rep) :-
+    atom(App),
+    collect_vins_appellation(App,[Vin|_]),
+    description(Vin,Rep), !.
 
 % ----- Conseils Bourgogne -----
 
@@ -412,6 +492,26 @@ regle_rep(autres,4,
   Rep) :-
      reponse_conseil(App,supplementaires,Rep).
 
+regle_rep(auriez,1,
+  [ vous, auriez, un, App ],
+  Rep) :-
+     reponse_conseil(App,principales,Rep).
+
+regle_rep(auriez,2,
+  [ vous, auriez, des, App ],
+  Rep) :-
+     reponse_conseil(App,principales,Rep).
+
+regle_rep(auriez,3,
+  [ auriez, vous, un, App ],
+  Rep) :-
+     reponse_conseil(App,principales,Rep).
+
+regle_rep(auriez,4,
+  [ auriez, vous, des, App ],
+  Rep) :-
+     reponse_conseil(App,principales,Rep).
+
 reponse_conseil(App,Type,Rep) :-
    conseil_appellation(App,Type,Intro,Lrec),
    lignes_recommandations(Lrec,Intro,Rep),
@@ -457,9 +557,24 @@ default_conseil_appellation(App, supplementaires, Intro, Lrec) :-
    ).
 
 collect_vins_appellation(App,Vins) :-
-   findall(Prix-Vin, (appellation(Vin,App), prix(Vin,Prix)), Raw),
-   keysort(Raw,Pairs),
+   findall(Prix-Vin, (appellation(Vin,App), prix(Vin,Prix)), Exact),
+   findall(Prix-Vin, (provenance(Vin,App), prix(Vin,Prix)), RegionPairs),
+   include(region_extra(Exact), RegionPairs, RegionExtra),
+   ( Exact \= []
+   -> Raw = Exact
+   ;  Raw = []
+   ),
+   append(Raw,RegionExtra,Combined),
+   ( Combined \= []
+   -> RawFinal = Combined
+   ;  RawFinal = RegionPairs
+   ),
+   keysort(RawFinal,Pairs),
    pairs_values(Pairs,Vins).
+
+region_extra(Exact,Pair) :-
+   Pair = _-Vin,
+   \+ memberchk(_-Vin,Exact).
 
 rec_appellation(App,Type,Vin,rec(Vin,Commentaire)) :-
    commentaire_appellation(App,Type,Commentaire).
@@ -521,25 +636,146 @@ profil_plat(canard,
     rhone_nord-[cote_rotie, saint_joseph, hermitage]
   ]).
 
-regle_rep(canard,1,
-  [ je, cuisine, du, canard, quel, vin, me, conseillezvous ],
-  Rep) :-
-    reponse_plat(canard,Rep).
+profil_plat(boeuf,
+  [ [ 'Pour le boeuf, misez sur des rouges charpentes qui accompagnent bien la viande.' ],
+    [ 'Ces appellations offrent de beaux accords :' ] ],
+  [ bordeaux-[pauillac, saint_julien, saint_estephe],
+    rhone_nord-[hermitage, saint_joseph],
+    sud_ouest-[madiran]
+  ]).
 
-regle_rep(canard,2,
-  [ pour, noel, j, '\'', envisage, de, cuisiner, du, canard, quel, vin, me, conseillezvous ],
-  Rep) :-
-    reponse_plat(canard,Rep).
+profil_plat(poisson,
+  [ [ 'Pour le poisson, privilegiez des blancs tendus et aromatiques.' ],
+    [ 'Voici des pistes fiables :' ] ],
+  [ loire-[sancerre, vouvray],
+    bourgogne-[chablis_premier_cru_montmains, macon_villages],
+    rhone_sud-[cotes_du_rhone]
+  ]).
 
-regle_rep(canard,3,
-  [ canard, quel, vin, me, conseillezvous ],
-  Rep) :-
-    reponse_plat(canard,Rep).
+profil_plat(boulets_liegeois,
+  [ [ 'Pour des boulets liegeois, il faut des rouges chaleureux mais digestes.' ],
+    [ 'Ces appellations s accordent tres bien :' ] ],
+  [ bordeaux-[cotes_de_bordeaux_blaye, bordeaux_superieur],
+    val_de_loire-[chinon],
+    beaujolais-[fleurie, chiroubles]
+  ]).
 
-regle_rep(canard,4,
-  [ je, vais, preparer, du, canard, quel, vin, me, conseillezvous ],
+profil_plat(carbonnade,
+  [ [ 'La carbonnade demande des rouges amples capables de repondre aux saveurs sucre-sale.' ],
+    [ 'Je vous recommande :' ] ],
+  [ bourgogne-[bourgogne_pinot_noir, hautes_cotes_de_beaune],
+    sud_ouest-[madiran],
+    rhone_sud-[cotes_du_rhone_villages]
+  ]).
+
+profil_plat(stoemp_saucisse,
+  [ [ 'Le stoemp saucisse aime les rouges ronds et epices qui reveillent le plat.' ],
+    [ 'Essayez ces appellations :' ] ],
+  [ rhone_sud-[cotes_du_rhone, cotes_du_rhone_villages_laudun],
+    beaujolais-[moulin_a_vent],
+    val_de_loire-[chinon]
+  ]).
+
+profil_plat(lapin_a_la_biere,
+  [ [ 'Pour le lapin a la biere, cherchez un rouge souple avec une touche maltée.' ],
+    [ 'Ces regions fonctionnent tres bien :' ] ],
+  [ bordeaux-[lalande_de_pomerol, saint_emilion],
+    bourgogne-[bourgogne_pinot_noir],
+    rhone_nord-[saint_joseph]
+  ]).
+
+profil_plat(potee_liegeoise,
+  [ [ 'La potee liegeoise appelle des blancs francs et aromatiques qui rafraichissent le palais.' ],
+    [ 'Quelques suggestions :' ] ],
+  [ alsace-[pinot_gris, gewurztraminer],
+    bourgogne-[macon_villages],
+    loire-[vouvray]
+  ]).
+
+profil_plat(chicons_au_gratin,
+  [ [ 'Les chicons au gratin aiment les blancs cremes mais tendus.' ],
+    [ 'Je vous conseille :' ] ],
+  [ bourgogne-[macon_villages, chablis_premier_cru_montmains],
+    loire-[cremant_de_loire]
+  ]).
+
+profil_plat(boudin_noir_aux_pommes,
+  [ [ 'Pour le boudin noir aux pommes, il faut un rouge aux notes epicees et compotees.' ],
+    [ 'Ces appellations marchent bien :' ] ],
+  [ rhone_sud-[cairanne, cotes_du_rhone],
+    rhone_sud_haut-[gigondas],
+    sud_ouest-[madiran]
+  ]).
+
+profil_plat(filet_americain,
+  [ [ 'Le filet americain aime la fraicheur des bulles ou des blancs acidules.' ],
+    [ 'Essayez :' ] ],
+  [ effervescents-[champagne, cremant_de_loire],
+    loire-[sancerre, vouvray]
+  ]).
+
+profil_plat(vol_au_vent,
+  [ [ 'Pour un vol-au-vent, privilegiez des blancs amples mais vifs.' ],
+    [ 'Quelques idees :' ] ],
+  [ bourgogne-[pouilly_fuisse, vire_clesse],
+    loire-[cremant_de_loire]
+  ]).
+
+profil_plat(tarte_al_djote,
+  [ [ 'La tarte al djote appelle des vins moelleux ou des bulles delicatement sucrees.' ],
+    [ 'Je suggere :' ] ],
+  [ sud_rhone_doux-[beaumes_de_venise],
+    effervescents-[champagne]
+  ]).
+
+profil_plat(waterzooi,
+  [ [ 'Pour un waterzooi, choisissez des blancs souples et floraux.' ],
+    [ 'Ces pistes fonctionnent bien :' ] ],
+  [ loire-[vouvray, sancerre],
+    rhone_sud-[cotes_du_rhone]
+  ]).
+
+regle_rep(Plat,1,
+  [ je, cuisine, du, Plat, quel, vin, me, conseillezvous ],
   Rep) :-
-    reponse_plat(canard,Rep).
+    plat_kw(Plat,Id),
+    reponse_plat(Id,Rep).
+
+regle_rep(Plat,2,
+  [ je, cuisine, des, Plat, quel, vin, me, conseillezvous ],
+  Rep) :-
+    plat_kw(Plat,Id),
+    reponse_plat(Id,Rep).
+
+regle_rep(Plat,3,
+  [ Plat, quel, vin, me, conseillezvous ],
+  Rep) :-
+    plat_kw(Plat,Id),
+    reponse_plat(Id,Rep).
+
+regle_rep(Plat,4,
+  [ je, fais, un, Plat, quel, vin, servir ],
+  Rep) :-
+    plat_kw(Plat,Id),
+    reponse_plat(Id,Rep).
+
+regle_rep(Plat,5,
+  [ quel, vin, avec, du, Plat ],
+  Rep) :-
+    plat_kw(Plat,Id),
+    reponse_plat(Id,Rep).
+
+regle_rep(Plat,6,
+  [ quel, vin, avec, des, Plat ],
+  Rep) :-
+    plat_kw(Plat,Id),
+    reponse_plat(Id,Rep).
+
+regle_rep(Plat,7,
+  [ quel, vin, pour, Plat ],
+  Rep) :-
+    plat_kw(Plat,Id),
+    reponse_plat(Id,Rep).
 
 reponse_plat(Plat,Rep) :-
     profil_plat(Plat,Intro,Groupes),
@@ -547,8 +783,19 @@ reponse_plat(Plat,Rep) :-
     append(Intro,Lignes,Rep).
 
 format_ligne_plat(Region-Appellations,Line) :-
-    atomic_list_concat(Appellations,', ',AppsTexte),
-    Line = [ Region, ': ', AppsTexte ].
+    humanize_label(Region,RegionLabel),
+    maplist(humanize_label,Appellations,PrettyApps),
+    atomic_list_concat(PrettyApps,', ',AppsTexte),
+    Line = [ RegionLabel, ': ', AppsTexte ].
+
+humanize_label(Atom,Label) :-
+    (   humanize_appellation(Atom,Label)
+    ->  true
+    ;   atom(Atom)
+    ->  atomic_list_concat(Parts,'_',Atom),
+        atomic_list_concat(Parts,' ',Label)
+    ;   Label = Atom
+    ).
 
 % ----- Definition d'appellations -----
 
@@ -669,8 +916,23 @@ regle_rep(moins,1,
   Rep) :-
      repondre_vins_prix(0,Max,Rep).
 
+regle_rep(moins,2,
+  [ des, vins, a, moins, de, Max ],
+  Rep) :-
+     repondre_vins_prix(0,Max,Rep).
+
 regle_rep(plus,1,
   [ des, vins, a, plus, de, Min, euros ],
+  Rep) :-
+     repondre_vins_prix(Min,inf,Rep).
+
+regle_rep(plus,2,
+  [ des, vins, a, plus, de, Min, eur ],
+  Rep) :-
+     repondre_vins_prix(Min,inf,Rep).
+
+regle_rep(plus,3,
+  [ des, vins, a, plus, de, Min ],
   Rep) :-
      repondre_vins_prix(Min,inf,Rep).
 
@@ -742,6 +1004,7 @@ lower_case(X,Y) :-
 	X >= 65,
 	X =< 90,
 	Y is X + 32, !.
+lower_case(224,224) :- !.
 
 lower_case(X,X).
 
@@ -863,14 +1126,146 @@ extract_atomics_aux([],[]).
 % clean_string(+String,-Cleanstring)
 %  removes all punctuation characters from String and return Cleanstring
 
+clean_string([],[]) :- !.
 clean_string([C|Chars],L) :-
-	my_char_type(C,punctuation),
-	clean_string(Chars,L), !.
-clean_string([C|Chars],[C|L]) :-
-	clean_string(Chars,L), !.
-clean_string([C|[]],[]) :-
-	my_char_type(C,punctuation), !.
-clean_string([C|[]],[C]).
+	decode_char(C,Chars,Decoded,Rest),
+	(  Decoded == skip
+	-> clean_string(Rest,L)
+	;  normalize_char(Decoded,N),
+	   (  my_char_type(N,punctuation)
+	   -> clean_string(Rest,L)
+	   ;  L = [N|R],
+	      clean_string(Rest,R)
+	   )
+	).
+
+decode_char(195,[Next|Rest],Code,Rest) :-
+	utf8_c3_pair(Next,Code), !.
+decode_char(197,[Next|Rest],Code,Rest) :-
+	utf8_c5_pair(Next,Code), !.
+decode_char(194,[160|Rest],32,Rest) :- !. % non-breaking space
+decode_char(226,[128,153|Rest],39,Rest) :- !. % right single quote
+decode_char(160,Chars,32,Chars) :- !.
+decode_char(8217,Chars,39,Chars) :- !.
+decode_char(Code,Chars,Code,Chars).
+
+utf8_c3_pair(Byte,Code) :-
+	utf8_c3_map(Byte,Char),
+	char_code(Char,Code).
+
+utf8_c3_map(128,a).
+utf8_c3_map(129,a).
+utf8_c3_map(130,a).
+utf8_c3_map(131,a).
+utf8_c3_map(132,a).
+utf8_c3_map(133,a).
+utf8_c3_map(134,a).
+utf8_c3_map(135,c).
+utf8_c3_map(136,e).
+utf8_c3_map(137,e).
+utf8_c3_map(138,e).
+utf8_c3_map(139,e).
+utf8_c3_map(140,i).
+utf8_c3_map(141,i).
+utf8_c3_map(142,i).
+utf8_c3_map(143,i).
+utf8_c3_map(145,n).
+utf8_c3_map(146,o).
+utf8_c3_map(147,o).
+utf8_c3_map(148,o).
+utf8_c3_map(149,o).
+utf8_c3_map(150,o).
+utf8_c3_map(153,u).
+utf8_c3_map(154,u).
+utf8_c3_map(155,u).
+utf8_c3_map(156,u).
+utf8_c3_map(160,a).
+utf8_c3_map(161,a).
+utf8_c3_map(162,a).
+utf8_c3_map(163,a).
+utf8_c3_map(164,a).
+utf8_c3_map(165,a).
+utf8_c3_map(166,a).
+utf8_c3_map(167,c).
+utf8_c3_map(168,e).
+utf8_c3_map(169,e).
+utf8_c3_map(170,e).
+utf8_c3_map(171,e).
+utf8_c3_map(172,i).
+utf8_c3_map(173,i).
+utf8_c3_map(174,i).
+utf8_c3_map(175,i).
+utf8_c3_map(177,n).
+utf8_c3_map(178,o).
+utf8_c3_map(179,o).
+utf8_c3_map(180,o).
+utf8_c3_map(181,o).
+utf8_c3_map(182,o).
+utf8_c3_map(185,u).
+utf8_c3_map(186,u).
+utf8_c3_map(187,u).
+utf8_c3_map(188,u).
+utf8_c3_map(189,y).
+utf8_c3_map(190,y).
+utf8_c3_map(191,y).
+
+utf8_c5_pair(Byte,Code) :-
+	utf8_c5_map(Byte,Char),
+	char_code(Char,Code).
+
+utf8_c5_map(146,o).
+utf8_c5_map(147,o).
+
+normalize_char(Code,Normalized) :-
+	accent_char(Code,Normalized), !.
+normalize_char(Code,Code).
+
+accent_char(224,97).  % à -> a
+accent_char(225,97).  % á -> a
+accent_char(226,97).  % â -> a
+accent_char(227,97).  % ã -> a
+accent_char(228,97).  % ä -> a
+accent_char(192,65).  % À -> A
+accent_char(193,65).  % Á -> A
+accent_char(194,65).  % Â -> A
+accent_char(195,65).  % Ã -> A
+accent_char(196,65).  % Ä -> A
+accent_char(231,99).  % ç -> c
+accent_char(199,67).  % Ç -> C
+accent_char(232,101). % è -> e
+accent_char(233,101). % é -> e
+accent_char(234,101). % ê -> e
+accent_char(235,101). % ë -> e
+accent_char(200,69).  % È -> E
+accent_char(201,69).  % É -> E
+accent_char(202,69).  % Ê -> E
+accent_char(203,69).  % Ë -> E
+accent_char(236,105). % ì -> i
+accent_char(237,105). % í -> i
+accent_char(238,105). % î -> i
+accent_char(239,105). % ï -> i
+accent_char(204,73).  % Ì -> I
+accent_char(205,73).  % Í -> I
+accent_char(206,73).  % Î -> I
+accent_char(207,73).  % Ï -> I
+accent_char(242,111). % ò -> o
+accent_char(243,111). % ó -> o
+accent_char(244,111). % ô -> o
+accent_char(245,111). % õ -> o
+accent_char(246,111). % ö -> o
+accent_char(210,79).  % Ò -> O
+accent_char(211,79).  % Ó -> O
+accent_char(212,79).  % Ô -> O
+accent_char(213,79).  % Õ -> O
+accent_char(214,79).  % Ö -> O
+accent_char(249,117). % ù -> u
+accent_char(250,117). % ú -> u
+accent_char(251,117). % û -> u
+accent_char(252,117). % ü -> u
+accent_char(217,85).  % Ù -> U
+accent_char(218,85).  % Ú -> U
+accent_char(219,85).  % Û -> U
+accent_char(220,85).  % Ü -> U
 
 
 /*****************************************************************************/
@@ -938,9 +1333,16 @@ ecrire_mot(M,0,0,E,1) :-
    espace(E), write(M).
 ecrire_mot(M,1,0,E,1) :-
    name(M,[C|L]),
-   D is C - 32,
+   upper_initial(C,D),
    name(N,[D|L]),
    espace(E), write(N).
+
+upper_initial(C,D) :-
+   C >= 97,
+   C =< 122,
+   !,
+   D is C - 32.
+upper_initial(C,C).
 
 espace(0).
 espace(N) :- N>0, Nn is N-1, write(' '), espace(Nn).

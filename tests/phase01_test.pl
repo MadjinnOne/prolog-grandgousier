@@ -132,15 +132,53 @@ test(appellation_no_more_supplementaires_message) :-
     produire_reponse([auriezvous, dautres, vins, de, saint, emilion], Rep),
     Rep = [[je, n, '\'', ai, plus, d, autres, vins, pour, saint, emilion, '.']].
 
+test(simple_appellation_question_without_vin_keyword) :-
+    produire_reponse([vous, auriez, un, graves], [Intro|Liste]),
+    Intro = [voici, quelques, vins, de, graves, que, je, peux, vous, proposer, ':'],
+    memberchk([ '- ', 'Ch. Menota Cuvee Montagrede 2014 - Graves', ' : ', 'profil classique de graves', ' (', 9.46, ' EUR )' ], Liste).
+
 test(canard_recommendation) :-
     produire_reponse([je, cuisine, du, canard, quel, vin, me, conseillezvous], [Intro1,Intro2|Groupes]),
     Intro1 = [ 'Pour le canard, je vous conseille des vins rouges puissants aux notes epicees et fumees.' ],
     Intro2 = [ 'Voici des appellations qui fonctionnent tres bien :' ],
-    memberchk([bordeaux, ': ', 'graves, saint_emilion, pomerol'], Groupes),
-    memberchk([rhone_nord, ': ', 'cote_rotie, saint_joseph, hermitage'], Groupes).
+    memberchk([bordeaux, ': ', 'graves, saint emilion, pomerol'], Groupes),
+    memberchk([bourgogne, ': ', 'marsannay, fixin, nuits saint georges, gevrey chambertin'], Groupes),
+    memberchk(['rhone nord', ': ', 'cote rotie, saint joseph, hermitage'], Groupes).
+
+test(boeuf_recommendation) :-
+    produire_reponse([je, cuisine, du, boeuf, quel, vin, me, conseillezvous], [Intro1,Intro2|Groupes]),
+    Intro1 = [ 'Pour le boeuf, misez sur des rouges charpentes qui accompagnent bien la viande.' ],
+    Intro2 = [ 'Ces appellations offrent de beaux accords :' ],
+    memberchk([bordeaux, ': ', 'pauillac, saint julien, saint estephe'], Groupes),
+    memberchk(['rhone nord', ': ', 'hermitage, saint joseph'], Groupes),
+    memberchk(['sud ouest', ': ', madiran], Groupes).
+
+test(poisson_recommendation) :-
+    produire_reponse([je, cuisine, du, poisson, quel, vin, me, conseillezvous], [Intro1,Intro2|Groupes]),
+    Intro1 = [ 'Pour le poisson, privilegiez des blancs tendus et aromatiques.' ],
+    Intro2 = [ 'Voici des pistes fiables :' ],
+    memberchk([loire, ': ', 'sancerre, vouvray'], Groupes),
+    memberchk([bourgogne, ': ', 'chablis premier cru montmains, macon villages'], Groupes),
+    memberchk(['rhone sud', ': ', 'cotes du rhone'], Groupes).
+
+test(boulets_liegeois_recommendation) :-
+    produire_reponse([quel, vin, avec, des, boulets, liegeois], [Intro1,Intro2|Groupes]),
+    Intro1 = [ 'Pour des boulets liegeois, il faut des rouges chaleureux mais digestes.' ],
+    Intro2 = [ 'Ces appellations s accordent tres bien :' ],
+    memberchk([bordeaux, ': ', 'cotes de bordeaux blaye, bordeaux superieur'], Groupes),
+    memberchk(['val de loire', ': ', chinon], Groupes),
+    memberchk([beaujolais, ': ', 'fleurie, chiroubles'], Groupes).
 
 test(appellation_definition) :-
     produire_reponse([que, recouvre, lappellation, haut, medoc], Rep),
+    definition_appellation(haut_medoc,Rep).
+
+test(appellation_question_utf8_input) :-
+    Codes = [81,117,101,32,114,101,99,111,117,118,114,101,32,108,226,128,153,97,112,112,101,108,108,97,116,105,111,110,32,72,97,117,116,45,77,195,169,100,111,99,32,63],
+    maplist(lower_case,Codes,Lowered),
+    clean_string(Lowered,Clean),
+    extract_atomics(Clean,Tokens),
+    produire_reponse(Tokens,Rep),
     definition_appellation(haut_medoc,Rep).
 
 :- end_tests(phase01).
