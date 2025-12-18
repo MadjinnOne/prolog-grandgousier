@@ -4,6 +4,7 @@
 :- discontiguous regle_rep/4.
 :- dynamic dernier_filtre/2.
 :- dynamic vins_proposes/2.
+:- dynamic dernier_vin/1.
 /* --------------------------------------------------------------------- */
 /*                                                                       */
 /*        PRODUIRE_REPONSE(L_Mots,L_Lignes_reponse) :                    */
@@ -49,6 +50,8 @@ match_pattern(Pattern,Lmots) :-
    sublist(Pattern,Lmots_norm).
 
 match_pattern(LPatterns,Lmots) :-
+   LPatterns = [First|_],
+   is_list(First),
    normaliser_question(Lmots,Lmots_norm),
    match_pattern_dist([100|LPatterns],Lmots_norm).
 
@@ -79,7 +82,20 @@ normaliser_question(Lmots,L_out) :-
    nom_vins_uniforme(Lmots,Ltmp),
    normaliser_appellations_tokens(Ltmp,Lapp),
    normaliser_plats_tokens(Lapp,Lplats),
-   maplist(normaliser_mot,Lplats,L_out).
+   expand_compound_tokens(Lplats,Lsplit),
+   maplist(normaliser_mot,Lsplit,L_out).
+
+expand_compound_tokens([],[]).
+expand_compound_tokens([estce|Rest],[est,ce|Out]) :-
+   expand_compound_tokens(Rest,Out).
+expand_compound_tokens([estceque|Rest],[est,ce,que|Out]) :-
+   expand_compound_tokens(Rest,Out).
+expand_compound_tokens([peuton|Rest],[peut,on|Out]) :-
+   expand_compound_tokens(Rest,Out).
+expand_compound_tokens([puisje|Rest],[puis,je|Out]) :-
+   expand_compound_tokens(Rest,Out).
+expand_compound_tokens([Token|Rest],[Token|Out]) :-
+   expand_compound_tokens(Rest,Out).
 
 normaliser_mots_clefs(Lin,Lout) :-
     maplist(normaliser_mot,Lin,Lout).
@@ -232,6 +248,9 @@ vin_synonyme(la_fleur_de_pomys_2012, [la,fleur,de,pomys]).
 vin_synonyme(la_fleur_de_pomys_2012, [lafleurdepomys,2012]).
 vin_synonyme(la_fleur_de_pomys_2012, [lafleurdepomys]).
 
+vin_synonyme(Vin,Pattern) :-
+   default_vin_pattern(Vin,Pattern).
+
 replace_vin(L,X,In,Out) :-
    append(L,Suf,In), !, Out = [X|Suf].
 replace_vin(_,_,[],[]) :- !.
@@ -248,6 +267,7 @@ mclef(prix,10).
 mclef(vin,5).
 mclef(vins,5).
 mclef(pourriezvous, 10).
+mclef(pourriez,10).
 mclef(que,9).
 mclef(quel,9).
 mclef(bourgogne,9).
@@ -256,6 +276,7 @@ mclef(autres,7).
 mclef(auriez,6).
 mclef(moins,7).
 mclef(plus,7).
+mclef(boire,8).
 mclef(boeuf,8).
 mclef(poisson,8).
 mclef(canard,8).
@@ -297,54 +318,62 @@ regle_rep(bouche,1,
   [ que, donne, le, Vin, en, bouche ],
   Rep ) :-
 
-     bouche(Vin,Rep).
+     bouche_reponse(Vin,Rep).
 
 regle_rep(bouche,2,
   [ que, donne, Vin, en, bouche ],
   Rep ) :-
-     bouche(Vin,Rep).
+     bouche_reponse(Vin,Rep).
 
 regle_rep(bouche,3,
   [ comment, est, Vin, en, bouche ],
   Rep ) :-
-     bouche(Vin,Rep).
+     bouche_reponse(Vin,Rep).
 
 regle_rep(bouche,4,
   [ que, donne, Vin, en, bouche, '?' ],
   Rep) :-
-     bouche(Vin,Rep).
+     bouche_reponse(Vin,Rep).
 
 regle_rep(bouche,5,
   [ bouche, de, Vin ],
   Rep) :-
-     bouche(Vin,Rep).
+     bouche_reponse(Vin,Rep).
 
 % ----------------------------------------------------------------%
 
 regle_rep(nez,1,
   [ quel, nez, presente, le, Vin ],
   Rep) :-
-    nez(Vin, Rep).
+    nez_reponse(Vin, Rep).
 
 regle_rep(nez,2,
   [ quel, nez, presente, Vin ],
   Rep) :-
-    nez(Vin, Rep).
+    nez_reponse(Vin, Rep).
 
 regle_rep(nez,3,
   [ quel, nez, pour, Vin ],
   Rep) :-
-    nez(Vin, Rep).
+    nez_reponse(Vin, Rep).
 
 regle_rep(nez,4,
   [ quel, nez, pour, Vin, '?' ],
   Rep) :-
-    nez(Vin, Rep).
+    nez_reponse(Vin, Rep).
 
 regle_rep(nez,5,
   [ nez, de, Vin ],
   Rep) :-
-    nez(Vin, Rep).
+    nez_reponse(Vin, Rep).
+
+bouche_reponse(Vin,Rep) :-
+    bouche(Vin,Rep),
+    memoriser_vin(Vin).
+
+nez_reponse(Vin,Rep) :-
+    nez(Vin,Rep),
+    memoriser_vin(Vin).
 
 % ----------------------------------------------------------------%
 
@@ -357,6 +386,16 @@ regle_rep(pourriezvous, 2,
   [ pourriezvous, men, dire, plus, sur, Vin ],
   Rep ) :-
     description_ou_appellation(Vin, Rep).
+
+regle_rep(pourriez,1,
+  [ pourriez, men, dire, plus, sur, le, Vin ],
+  Rep) :-
+    description_ou_appellation(Vin,Rep).
+
+regle_rep(pourriez,2,
+  [ pourriez, men, dire, plus, sur, Vin ],
+  Rep) :-
+    description_ou_appellation(Vin,Rep).
 
 regle_rep(que,1,
   [ que, pouvezvous, me, dire, sur, le, Vin ],
@@ -384,11 +423,13 @@ regle_rep(parlezvous,1,
     description_ou_appellation(Vin,Rep).
 
 description_ou_appellation(Vin,Rep) :-
-    description(Vin,Rep), !.
+    description(Vin,Rep),
+    memoriser_vin(Vin), !.
 description_ou_appellation(App,Rep) :-
     atom(App),
     collect_vins_appellation(App,[Vin|_]),
-    description(Vin,Rep), !.
+    description(Vin,Rep),
+    memoriser_vin(Vin), !.
 
 % ----- Conseils Bourgogne -----
 
@@ -511,6 +552,314 @@ regle_rep(auriez,4,
   [ auriez, vous, des, App ],
   Rep) :-
      reponse_conseil(App,principales,Rep).
+
+% ----- Maturite de degustation -----
+
+regle_rep(boire,1,
+  [ est, ce, un, vin, que, je, peux, boire, tout, de, suite, Vin ],
+  Rep) :-
+    reponse_accessibilite(Vin,Rep).
+
+regle_rep(boire,2,
+  [ est, ce, un, vin, que, je, peux, boire, tout, de, suite, Det, Vin ],
+  Rep) :-
+    det_vin(Det),
+    reponse_accessibilite(Vin,Rep).
+
+regle_rep(boire,3,
+  [ est, ce, que, je, peux, boire, Vin, tout, de, suite ],
+  Rep) :-
+    reponse_accessibilite(Vin,Rep).
+
+regle_rep(boire,4,
+  [ est, ce, que, je, peux, boire, Det, Vin, tout, de, suite ],
+  Rep) :-
+    det_vin(Det),
+    reponse_accessibilite(Vin,Rep).
+
+regle_rep(boire,5,
+  [ est, ce, que, je, peux, boire, Vin, maintenant ],
+  Rep) :-
+    reponse_accessibilite(Vin,Rep).
+
+regle_rep(boire,6,
+  [ est, ce, que, je, peux, boire, Det, Vin, maintenant ],
+  Rep) :-
+    det_vin(Det),
+    reponse_accessibilite(Vin,Rep).
+
+regle_rep(boire,7,
+  [ puis, je, boire, Vin, maintenant ],
+  Rep) :-
+    reponse_accessibilite(Vin,Rep).
+
+regle_rep(boire,8,
+  [ puis, je, boire, Det, Vin, maintenant ],
+  Rep) :-
+    det_vin(Det),
+    reponse_accessibilite(Vin,Rep).
+
+regle_rep(boire,9,
+  [ puis, je, deja, boire, Vin ],
+  Rep) :-
+    reponse_accessibilite(Vin,Rep).
+
+regle_rep(boire,10,
+  [ puis, je, deja, boire, Det, Vin ],
+  Rep) :-
+    det_vin(Det),
+    reponse_accessibilite(Vin,Rep).
+
+regle_rep(boire,11,
+  [ je, peux, deja, boire, Vin ],
+  Rep) :-
+    reponse_accessibilite(Vin,Rep).
+
+regle_rep(boire,12,
+  [ je, peux, deja, boire, Det, Vin ],
+  Rep) :-
+    det_vin(Det),
+    reponse_accessibilite(Vin,Rep).
+
+regle_rep(boire,13,
+  [ peut, on, boire, Vin, tout, de, suite ],
+  Rep) :-
+    reponse_accessibilite(Vin,Rep).
+
+regle_rep(boire,14,
+  [ peut, on, boire, Det, Vin, tout, de, suite ],
+  Rep) :-
+    det_vin(Det),
+    reponse_accessibilite(Vin,Rep).
+
+regle_rep(boire,15,
+  [ peut, on, boire, Vin, maintenant ],
+  Rep) :-
+    reponse_accessibilite(Vin,Rep).
+
+regle_rep(boire,16,
+  [ peut, on, boire, Det, Vin, maintenant ],
+  Rep) :-
+    det_vin(Det),
+    reponse_accessibilite(Vin,Rep).
+
+regle_rep(boire,17,
+  [ Vin, est, il, pret, a, boire ],
+  Rep) :-
+    reponse_accessibilite(Vin,Rep).
+
+regle_rep(boire,18,
+  [ Det, Vin, est, il, pret, a, boire ],
+  Rep) :-
+    det_vin(Det),
+    reponse_accessibilite(Vin,Rep).
+
+regle_rep(boire,19,
+  [ je, peux, boire, Vin, tout, de, suite ],
+  Rep) :-
+    reponse_accessibilite(Vin,Rep).
+
+regle_rep(boire,20,
+  [ je, peux, boire, Det, Vin, tout, de, suite ],
+  Rep) :-
+    det_vin(Det),
+    reponse_accessibilite(Vin,Rep).
+
+regle_rep(boire,21,
+  [ je, peux, boire, Vin, maintenant ],
+  Rep) :-
+    reponse_accessibilite(Vin,Rep).
+
+regle_rep(boire,22,
+  [ je, peux, boire, Det, Vin, maintenant ],
+  Rep) :-
+    det_vin(Det),
+    reponse_accessibilite(Vin,Rep).
+
+regle_rep(boire,23,
+  [ est, ce, un, vin, que, je, peux, boire, tout, de, suite ],
+  Rep) :-
+    reponse_accessibilite(_,Rep).
+
+regle_rep(boire,24,
+  [ est, ce, un, vin, que, je, peux, boire, maintenant ],
+  Rep) :-
+    reponse_accessibilite(_,Rep).
+
+regle_rep(boire,25,
+  [ est, ce, que, je, peux, le, boire, tout, de, suite ],
+  Rep) :-
+    reponse_accessibilite(_,Rep).
+
+regle_rep(boire,26,
+  [ est, ce, que, je, peux, le, boire, maintenant ],
+  Rep) :-
+    reponse_accessibilite(_,Rep).
+
+reponse_accessibilite(Vin,Rep) :-
+    var(Vin),
+    dernier_vin(Dernier),
+    nonvar(Dernier),
+    reponse_accessibilite(Dernier,Rep), !.
+reponse_accessibilite(Vin,[[pour, vous, repondre, j, ai, besoin, de, connaitre, le, vin, dont, vous, parlez, '.']]) :-
+    var(Vin), !.
+reponse_accessibilite(Vin,Rep) :-
+    (  description(Vin,_)
+    ;  bouche(Vin,_)
+    ),
+    memoriser_vin(Vin),
+    collect_observations(Vin,Observations),
+    decide_accessibilite(Observations,Decision),
+    build_accessibilite_response(Decision,Observations,Rep), !.
+reponse_accessibilite(_,[[je, ne, connais, pas, ce, vin, '.']]).
+
+det_vin(le).
+det_vin(la).
+det_vin(l).
+det_vin(ce).
+det_vin(cet).
+det_vin(cette).
+det_vin(ces).
+
+memoriser_vin(Vin) :-
+    atom(Vin),
+    retractall(dernier_vin(_)),
+    asserta(dernier_vin(Vin)).
+memoriser_vin(_).
+
+collect_observations(Vin,Observations) :-
+    findall(obs(Side,Aspect,Source,Text),
+       ( keyword_profile(Side,Aspect,Keyword),
+         texte_vin(Vin,Source,Text),
+         downcase_atom(Text,Lower),
+         sub_atom(Lower,_,_,_,Keyword)
+       ),
+       Raw),
+    sort(Raw,Observations).
+
+decide_accessibilite([],unknown).
+decide_accessibilite(Observations,Decision) :-
+    score_side(Observations,ready,Ready),
+    score_side(Observations,wait,Wait),
+    (  Ready >= Wait + 1
+    -> Decision = ready
+    ;  Wait >= Ready + 1
+    -> Decision = wait
+    ;  Decision = mix
+    ).
+
+score_side(Observations,Side,Score) :-
+    findall(1, member(obs(Side,_,_,_),Observations), On),
+    length(On,Score).
+
+build_accessibilite_response(unknown,_,[[je, n, '\'', ai, pas, suffisamment, d, indications, pour, dire, si, ce, vin, est, pret, a, boire, '.']]).
+build_accessibilite_response(Decision,Observations,Rep) :-
+    Decision \= unknown,
+    decision_intro(Decision,Intro),
+    detail_lines(Decision,Observations,Details),
+    (  Details == []
+    -> Rep = [Intro]
+    ;  Rep = [Intro|Details]
+    ).
+
+decision_intro(ready,
+  [ oui, ',', ce, vin, peut, etre, apprecie, des, maintenant, ',', car, il, montre, deja, une, belle, souplesse, '.']).
+decision_intro(wait,
+  [ il, est, preferable, d, attendre, encore, un, peu, ',', car, il, reste, tres, structure, '.']).
+decision_intro(mix,
+  [ oui, ',', mais, il, gagnera, encore, en, complexite, ',', car, il, garde, une, charpente, serieuse, '.']).
+
+detail_lines(Decision,Observations,Lines) :-
+    observations_lines(Observations,ready,ReadyLines),
+    observations_lines(Observations,wait,WaitLines),
+    (  Decision == ready
+    -> Lines = ReadyLines
+    ;  Decision == wait
+    -> Lines = WaitLines
+    ;  Decision == mix
+    -> append(ReadyLines,WaitLines,Lines)
+    ;  Lines = []
+    ).
+
+observations_lines(Observations,Side,Lines) :-
+    observations_by_side(Observations,Side,SideObs),
+    max_observations_per_side(Limit),
+    take_n(SideObs,Limit,Selected,_),
+    maplist(observation_line,Selected,Lines).
+
+observations_by_side([],_,[]).
+observations_by_side([obs(S,Aspect,Source,Text)|Rest],Side,[obs(S,Aspect,Source,Text)|Filtered]) :-
+    S == Side,
+    observations_by_side(Rest,Side,Filtered).
+observations_by_side([obs(S,_,_,_)|Rest],Side,Filtered) :-
+    S \= Side,
+    observations_by_side(Rest,Side,Filtered).
+
+observation_line(obs(Side,Aspect,Source,Text),Line) :-
+    observation_phrase(Side,Aspect,Source,Text,Line).
+
+observation_phrase(ready,structure,Source,Text,
+  [ la, Source, mentionne, Text, ',', ce, qui, met, en, avant, une, structure, deja, souple, '.']).
+observation_phrase(ready,tannins,_,Text,
+  [ on, y, lit, Text, ',', ce, qui, montre, que, les, tannins, sont, deja, integres, '.']).
+observation_phrase(ready,style,_,Text,
+  [ ce, passage, Text, souligne, un, style, accessible, '.']).
+observation_phrase(wait,structure,Source,Text,
+  [ la, Source, insiste, sur, Text, ',', ce, qui, souligne, une, charpente, puissante, '.']).
+observation_phrase(wait,tannins,_,Text,
+  [ on, y, lit, Text, ',', ce, qui, laisse, penser, que, les, tannins, doivent, encore, se, fondre, '.']).
+observation_phrase(wait,style,_,Text,
+  [ ce, passage, Text, evoque, un, profil, de, garde, '.']).
+
+max_observations_per_side(2).
+
+texte_vin(Vin,description,Text) :-
+    description(Vin,Paragraphes),
+    member(Ligne,Paragraphes),
+    member(Text,Ligne),
+    Text \= '.'.
+texte_vin(Vin,bouche,Text) :-
+    bouche(Vin,Paragraphes),
+    member(Ligne,Paragraphes),
+    member(Text,Ligne),
+    Text \= '.'.
+
+keyword_profile(ready,structure,'soupl').
+keyword_profile(ready,structure,'rond').
+keyword_profile(ready,structure,'gouley').
+keyword_profile(ready,structure,'velout').
+keyword_profile(ready,structure,'velour').
+keyword_profile(ready,structure,'soyeu').
+keyword_profile(ready,structure,'harmon').
+keyword_profile(ready,structure,'charme').
+keyword_profile(ready,structure,'tendr').
+keyword_profile(ready,structure,'plaisan').
+keyword_profile(ready,structure,'gourmand').
+keyword_profile(ready,structure,'elegant').
+keyword_profile(ready,style,'charme').
+keyword_profile(ready,style,'plaisan').
+keyword_profile(ready,style,'gouley').
+keyword_profile(ready,style,'gourmand').
+keyword_profile(ready,style,'vin de present').
+keyword_profile(ready,style,'a boire').
+keyword_profile(ready,tannins,'tannins fin').
+keyword_profile(ready,tannins,'tannins soyeu').
+keyword_profile(ready,tannins,'tannins eleg').
+keyword_profile(ready,tannins,'tannins mur').
+keyword_profile(ready,tannins,'tannins enrobe').
+keyword_profile(ready,tannins,'enrobe').
+keyword_profile(ready,tannins,'enrobee').
+
+keyword_profile(wait,structure,'puiss').
+keyword_profile(wait,structure,'dens').
+keyword_profile(wait,structure,'concentr').
+keyword_profile(wait,structure,'charpent').
+keyword_profile(wait,structure,'corse').
+keyword_profile(wait,structure,'etoff').
+keyword_profile(wait,style,'d avenir').
+keyword_profile(wait,tannins,'tannins puiss').
+keyword_profile(wait,tannins,'tanins riches').
+keyword_profile(wait,tannins,'fondre les tannins').
 
 reponse_conseil(App,Type,Rep) :-
    conseil_appellation(App,Type,Intro,Lrec),
@@ -1277,6 +1626,49 @@ read_atomics(ListOfAtomics) :-
 	read_lc_string(String),
 	clean_string(String,Cleanstring),
 	extract_atomics(Cleanstring,ListOfAtomics).
+
+default_vin_pattern(Vin,Tokens) :-
+    nom(Vin,Nom),
+    atom_string(Nom,NomStr),
+    normalize_label_tokens(NomStr,BaseTokens),
+    tokens_variant(BaseTokens,Tokens),
+    Tokens \= [].
+default_vin_pattern(Vin,Tokens) :-
+    nom(Vin,Nom),
+    atom_string(Nom,NomStr),
+    sub_string(NomStr,Before,_,_, "-"),
+    sub_string(NomStr,0,Before,_,Prefix),
+    normalize_label_tokens(Prefix,BaseTokens),
+    tokens_variant(BaseTokens,Tokens),
+    Tokens \= [].
+
+normalize_label_tokens(Text,Tokens) :-
+    string_lower(Text,Lower),
+    string_codes(Lower,Codes),
+    clean_string(Codes,Clean),
+    extract_atomics(Clean,Tokens).
+
+tokens_variant(Tokens,Variant) :-
+    base_tokens_variant(Tokens,Base),
+    remove_trailing_year(Base,Variant).
+
+base_tokens_variant(Tokens,Tokens).
+base_tokens_variant([First|Rest],Rest) :-
+    article_token(First),
+    Rest \= [].
+
+remove_trailing_year(Tokens,Tokens).
+remove_trailing_year(Tokens,Core) :-
+    append(Core,[Last],Tokens),
+    (   integer(Last)
+    ;   atom(Last), atom_number(Last,_)
+    ),
+    Core \= [].
+
+article_token(le).
+article_token(la).
+article_token(l).
+article_token(les).
 
 
 
