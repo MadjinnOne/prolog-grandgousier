@@ -113,16 +113,12 @@ test(bourgogne_other_recommendations) :-
     memberchk([ '- ', 'Chambolle Musigny 1er Cru 2012 - Les Noirots', ' : ', 'grand pinot soyeux et complexe', ' (', 63.85, ' EUR )' ], Liste).
 
 test(bourgogne_other_after_initial) :-
-    retractall(dernier_filtre(_,_)),
-    retractall(vins_proposes(_,_)),
     produire_reponse([quels, vins, de, bourgogne, me, conseillezvous], _),
     produire_reponse([auriezvous, dautres, vins, de, bourgogne], [Intro|Liste]),
     Intro = [j, '\'', ai, aussi, d, autres, vins, de, bourgogne, a, vous, proposer, ':'],
     memberchk([ '- ', 'Nuits-Saint-Georges 1er Cru 2013, Les Chaboeufs', ' : ', 'nuits saint georges 1er cru, puissant et race', ' (', 42.35, ' EUR )' ], Liste).
 
 test(graves_generic_recommendation) :-
-    retractall(dernier_filtre(_,_)),
-    retractall(vins_proposes(_,_)),
     produire_reponse([quels, vins, de, graves, me, conseillezvous], [Intro|Liste]),
     Intro = [voici, quelques, vins, de, graves, que, je, peux, vous, proposer, ':'],
     memberchk([ '- ', 'Ch. Menota Cuvee Montagrede 2014 - Graves', ' : ', 'profil classique de graves', ' (', 9.46, ' EUR )' ], Liste),

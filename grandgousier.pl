@@ -2,8 +2,6 @@
 :- use_module(library(pairs)).
 :- use_module(base_vins).      % <--- on charge la base de connaissances
 :- discontiguous regle_rep/4.
-:- dynamic dernier_filtre/2.
-:- dynamic vins_proposes/2.
 :- dynamic dernier_vin/1.
 /* --------------------------------------------------------------------- */
 /*                                                                       */
@@ -49,34 +47,9 @@ match_pattern(Pattern,Lmots) :-
    normaliser_question(Lmots,Lmots_norm),
    sublist(Pattern,Lmots_norm).
 
-match_pattern(LPatterns,Lmots) :-
-   LPatterns = [First|_],
-   is_list(First),
-   normaliser_question(Lmots,Lmots_norm),
-   match_pattern_dist([100|LPatterns],Lmots_norm).
-
-match_pattern_dist([],_).
-match_pattern_dist([N,Pattern|Lpatterns],Lmots) :-
-   within_dist(N,Pattern,Lmots,Lmots_rem),
-   match_pattern_dist(Lpatterns,Lmots_rem).
-
-within_dist(_,Pattern,Lmots,Lmots_rem) :-
-   prefixrem(Pattern,Lmots,Lmots_rem).
-within_dist(N,Pattern,[_|Lmots],Lmots_rem) :-
-   N > 1, Naux is N-1,
-  within_dist(Naux,Pattern,Lmots,Lmots_rem).
-
-
 sublist(SL,L) :-
    prefix(SL,L), !.
 sublist(SL,[_|T]) :- sublist(SL,T).
-
-sublistrem(SL,L,Lr) :-
-   prefixrem(SL,L,Lr), !.
-sublistrem(SL,[_|T],Lr) :- sublistrem(SL,T,Lr).
-
-prefixrem([],L,L).
-prefixrem([H|T],[H|L],Lr) :- prefixrem(T,L,Lr).
 
 normaliser_question(Lmots,L_out) :-
    nom_vins_uniforme(Lmots,Ltmp),
@@ -96,9 +69,6 @@ expand_compound_tokens([puisje|Rest],[puis,je|Out]) :-
    expand_compound_tokens(Rest,Out).
 expand_compound_tokens([Token|Rest],[Token|Out]) :-
    expand_compound_tokens(Rest,Out).
-
-normaliser_mots_clefs(Lin,Lout) :-
-    maplist(normaliser_mot,Lin,Lout).
 
 normaliser_mot(lappellation,appellation) :- !.
 normaliser_mot(Mot,Mot).
@@ -262,15 +232,11 @@ replace_vin(L,X,[H|In],[H|Out]) :-
 
 mclef(bouche,10).
 mclef(nez,10).
-mclef(description, 10).
-mclef(prix,10).
 mclef(vin,5).
 mclef(vins,5).
 mclef(pourriezvous, 10).
 mclef(pourriez,10).
 mclef(que,9).
-mclef(quel,9).
-mclef(bourgogne,9).
 mclef(dautres,7).
 mclef(autres,7).
 mclef(auriez,6).
@@ -452,31 +418,6 @@ conseil_appellation(App,Type,Intro,Lrec) :-
    conseil_appellation_fact(App,Type,Intro,Lrec), !.
 conseil_appellation(App,Type,Intro,Lrec) :-
    default_conseil_appellation(App,Type,Intro,Lrec).
-
-regle_rep(bourgogne,1,
-  [ quels, vins, de, bourgogne, me, conseillezvous ],
-  Rep) :-
-     reponse_conseil(bourgogne,principales,Rep).
-
-regle_rep(bourgogne,2,
-  [ quels, vins, de, bourgogne, me, conseillez, vous ],
-  Rep) :-
-     reponse_conseil(bourgogne,principales,Rep).
-
-regle_rep(bourgogne,3,
-  [ auriezvous, dautres, vins, de, bourgogne ],
-  Rep) :-
-     reponse_conseil(bourgogne,supplementaires,Rep).
-
-regle_rep(bourgogne,4,
-  [ auriezvous, autres, vins, de, bourgogne ],
-  Rep) :-
-     reponse_conseil(bourgogne,supplementaires,Rep).
-
-regle_rep(bourgogne,5,
-  [ auriez, vous, d, autres, vins, de, bourgogne ],
-  Rep) :-
-     reponse_conseil(bourgogne,supplementaires,Rep).
 
 regle_rep(vins,12,
   [ quels, vins, de, App, me, conseillezvous ],
@@ -863,11 +804,7 @@ keyword_profile(wait,tannins,'fondre les tannins').
 
 reponse_conseil(App,Type,Rep) :-
    conseil_appellation(App,Type,Intro,Lrec),
-   lignes_recommandations(Lrec,Intro,Rep),
-   retractall(dernier_filtre(_,_)),
-   asserta(dernier_filtre(appellation,App)),
-   retractall(vins_proposes(appellation(_),_)),
-   assertz(vins_proposes(appellation(App),Type)).
+   lignes_recommandations(Lrec,Intro,Rep).
 
 lignes_recommandations([],Intro,[Intro]).
 lignes_recommandations(Lrec,Intro,[Intro|Lines]) :-
@@ -1159,9 +1096,6 @@ appellation_synonymes_fact(haut_medoc,
     [ l, '\'', appellation, haut, medoc ],
     [ appellation, haut, medoc ] ]).
 
-definition_appellation_par_defaut(
-  [ [ je, n, '\'', ai, pas, d, informations, sur, cette, appellation, '.' ] ]).
-
 regle_rep(appellation,1,
   [ que, recouvre, appellation, App ],
   Rep) :-
@@ -1182,12 +1116,6 @@ regle_rep(appellation,3,
 
 regle_rep(appellation,4,
   [ que, recouvre, l, '\'', appellation, App, '?' ],
-  Rep) :-
-    normaliser_appellation(App,Id),
-    definition_appellation(Id,Rep).
-
-regle_rep(appellation,5,
-  [ que, recouvre, appellation, App ],
   Rep) :-
     normaliser_appellation(App,Id),
     definition_appellation(Id,Rep).

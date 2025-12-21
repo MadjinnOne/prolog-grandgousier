@@ -2,8 +2,6 @@
     nom/2, prix/2, nez/2, bouche/2, description/2,
     provenance/2, appellation/2]).
 
-% -------- Base de connaissances sur les vins -------- %
-
 nom(beaumes_de_venise_2015, 'Beaumes-de-Venise 2015').
 nom(les_chaboeufs_2013, 'Nuits-Saint-Georges 1er Cru 2013, Les Chaboeufs').
 nom(ch_moulin_de_mallet_2014, 'Ch. Moulin de Mallet 2014 - Bordeaux').
@@ -137,8 +135,6 @@ prix(champagne_brut_prestige, 29.22).
 prix(cognac_trois_etoiles, 20.87).
 prix(cognac_fine_champagne_vsop, 22.26).
 prix(cognac_grande_champagne_hors_age, 32.28).
-
-% Provenance (grande region) et appellation pour l'ensemble des vins.
 
 provenance(beaumes_de_venise_2015, rhone_sud).
 provenance(les_chaboeufs_2013, bourgogne).
