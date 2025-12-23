@@ -1,8 +1,22 @@
+% ==============================================================================
+% SECTION: Chargement et declarations
+% Rôle: Charger les dependances, la base de connaissance, et les directives moteur.
+% Entrées: -
+% Sorties: -
+% Notes: base_vins fournit notamment nom/2, prix/2, appellation/2, provenance/2, description/2, bouche/2, nez/2.
+% ==============================================================================
 :- use_module(library(lists)).
 :- use_module(library(pairs)).
 :- use_module(base_vins).      % <--- on charge la base de connaissances
 :- discontiguous regle_rep/4.
 :- dynamic dernier_vin/1.
+% ==============================================================================
+% SECTION: Production de reponses
+% Rôle: Dispatcher la question normalisee vers une regle et construire la reponse.
+% Entrées: Liste de mots (tokens) issue de la lecture utilisateur.
+% Sorties: Liste de lignes (listes de tokens) repondant au bot.
+% Notes: regle_rep/4 definissent les patrons; match_pattern/2 teste sur tokens normalises.
+% ==============================================================================
 /* --------------------------------------------------------------------- */
 /*                                                                       */
 /*        PRODUIRE_REPONSE(L_Mots,L_Lignes_reponse) :                    */
@@ -27,6 +41,7 @@
 
 /*                      !!!    A MODIFIER   !!!                          */
 
+% Predicat principal: selectionne une regle et produit la liste de lignes.
 produire_reponse([fin],[L1]) :-
    L1 = [merci, de, m, '\'', avoir, consulte], !.
 
@@ -43,6 +58,13 @@ produire_reponse(_,[L1,L2, L3]) :-
    L2 = [les, etudiants, vont, m, '\'', aider, '.' ],
    L3 = ['vous le verrez !'].
 
+% ==============================================================================
+% SECTION: Normalisation et matching
+% Rôle: Comparer une question a des patrons via une normalisation des tokens.
+% Entrées: Liste de tokens bruts (mots/punctuation) d'une question utilisateur.
+% Sorties: Tokens normalises ou succes/echec de correspondance.
+% Notes: normaliser_question/2 applique synonymes, plats, appellations et expansions.
+% ==============================================================================
 match_pattern(Pattern,Lmots) :-
    normaliser_question(Lmots,Lmots_norm),
    sublist(Pattern,Lmots_norm).
@@ -51,6 +73,7 @@ sublist(SL,L) :-
    prefix(SL,L), !.
 sublist(SL,[_|T]) :- sublist(SL,T).
 
+% Pipeline de normalisation: unifie les noms de vins/appellations/plats puis abaisse les variantes.
 normaliser_question(Lmots,L_out) :-
    nom_vins_uniforme(Lmots,Ltmp),
    normaliser_appellations_tokens(Ltmp,Lapp),
@@ -58,6 +81,13 @@ normaliser_question(Lmots,L_out) :-
    expand_compound_tokens(Lplats,Lsplit),
    maplist(normaliser_mot,Lsplit,L_out).
 
+% ==============================================================================
+% SECTION: Normalisation lexicale
+% Rôle: Etendre tokens composes et harmoniser variantes (vins, plats, appellations).
+% Entrées: Listes de tokens (atoms) issues des questions utilisateur.
+% Sorties: Listes de tokens homogenes pour le matching.
+% Notes: Les remplacements privilegient les patrons les plus longs via un tri par longueur.
+% ==============================================================================
 expand_compound_tokens([],[]).
 expand_compound_tokens([estce|Rest],[est,ce|Out]) :-
    expand_compound_tokens(Rest,Out).
@@ -110,6 +140,13 @@ remplace_plats([plat(Plat,Pattern)|Rest],Lin,Lout) :-
    replace_vin(Pattern,Plat,Lin,Linter),
    remplace_plats(Rest,Linter,Lout).
 
+% ==============================================================================
+% SECTION: Lexiques et synonymes
+% Rôle: Declarer les patrons connus pour plats, appellations et vins.
+% Entrées: Tokens normalises issus du preprocess.
+% Sorties: Variantes standardisees (atoms) pour plat/appellation/vin.
+% Notes: Les synonymes servent aux remplacements effectues plus haut.
+% ==============================================================================
 plat_synonyme(canard,[canard]).
 plat_synonyme(boeuf,[boeuf]).
 plat_synonyme(poisson,[poisson]).
@@ -137,6 +174,7 @@ plat_synonyme(vol_au_vent,[volauvent]).
 plat_synonyme(tarte_al_djote,[tarte,al,djote]).
 plat_synonyme(tarte_al_djote,[tarte,djote]).
 plat_synonyme(waterzooi,[waterzooi]).
+% Synonymes d'appellations definis en base ou derives des identifiants.
 appellation_synonymes(App,Syns) :-
    ( var(App)
    -> setof(A, source_appellation(A), Apps), member(App,Apps)
@@ -184,6 +222,7 @@ remplace_variants([variant(Vin,Pattern)|Reste],Lin,Lout) :-
    replace_vin(Pattern,Vin,Lin,Linter),
    remplace_variants(Reste,Linter,Lout).
 
+% Synonymes explicites de vins; complete ensuite par un pattern par defaut.
 vin_synonyme(beaumes_de_venise_2015, [beaumes,de,venise,2015]).
 vin_synonyme(beaumes_de_venise_2015, [beaumes,de,venise]).
 vin_synonyme(beaumes_de_venise_2015, [beaumesdevenise,2015]).
@@ -227,9 +266,17 @@ replace_vin(_,_,[],[]) :- !.
 replace_vin(L,X,[H|In],[H|Out]) :-
    replace_vin(L,X,In,Out).
 
+% ==============================================================================
+% SECTION: Mots-cles et mapping plats
+% Rôle: Ponderer les mots clefs pour le dispatch et normaliser les plats.
+% Entrées: Tokens normalises.
+% Sorties: Poids (mclef/2) et identifiants de plat (plat_kw/2).
+% Notes: mclef/2 est utilise par produire_reponse/2 via clause/2.
+% ==============================================================================
 % ----------------------------------------------------------------%
 
 
+% Mots clefs et scores utilises pour choisir la regle la plus pertinente.
 mclef(bouche,10).
 mclef(nez,10).
 mclef(vin,5).
@@ -262,6 +309,7 @@ mclef(parle,2).
 mclef(parlezvous,2).
 mclef(appellation,8).
 
+% Alias de plats pour matcher plusieurs patrons vers un meme identifiant.
 plat_kw(canard,canard).
 plat_kw(boeuf,boeuf).
 plat_kw(poisson,poisson).
@@ -278,8 +326,16 @@ plat_kw(tarte_al_djote,tarte_al_djote).
 plat_kw(waterzooi,waterzooi).
 
 
+% ==============================================================================
+% SECTION: Regles degustation (bouche/nez)
+% Rôle: Repondre aux questions sur le nez et la bouche d'un vin.
+% Entrées: Patterns contenant un identifiant de vin.
+% Sorties: Reponse textuelle (listes de tokens) issue de la base.
+% Notes: memoriser_vin/1 stocke le dernier vin cite pour des questions suivantes.
+% ==============================================================================
 % ----------------------------------------------------------------%
 
+% Convention: regle_rep(MotCle,Id,Pattern,Rep) ou Pattern est une liste de tokens.
 regle_rep(bouche,1,
   [ que, donne, le, Vin, en, bouche ],
   Rep ) :-
@@ -341,6 +397,13 @@ nez_reponse(Vin,Rep) :-
     nez(Vin,Rep),
     memoriser_vin(Vin).
 
+% ==============================================================================
+% SECTION: Regles description et appellation
+% Rôle: Fournir une description d'un vin ou d'une appellation cible.
+% Entrées: Identifiant de vin ou nom d'appellation (atom).
+% Sorties: Paragraphes de description issus de la base de connaissances.
+% Notes: Peut basculer d'une appellation vers un vin representatif.
+% ==============================================================================
 % ----------------------------------------------------------------%
 
 regle_rep(pourriezvous, 1,
@@ -397,6 +460,13 @@ description_ou_appellation(App,Rep) :-
     description(Vin,Rep),
     memoriser_vin(Vin), !.
 
+% ==============================================================================
+% SECTION: Conseils par appellation
+% Rôle: Recommander des vins pour une appellation donnee.
+% Entrées: Appellation (atom) et type de selection (principales/supplementaires).
+% Sorties: Lignes de recommandation formatees.
+% Notes: Peut utiliser des recommandations predefinies ou generer a partir de la base.
+% ==============================================================================
 % ----- Conseils Bourgogne -----
 
 conseil_appellation_fact(bourgogne, principales,
@@ -494,6 +564,13 @@ regle_rep(auriez,4,
   Rep) :-
      reponse_conseil(App,principales,Rep).
 
+% ==============================================================================
+% SECTION: Maturite de degustation
+% Rôle: Repondre aux questions sur l'accessibilite d'un vin (pret a boire ou non).
+% Entrées: Identifiant de vin ou variable si le vin n'est pas explicite.
+% Sorties: Reponse textuelle fondee sur les observations disponibles.
+% Notes: Utilise dernier_vin/1 quand le vin est omis par l'utilisateur.
+% ==============================================================================
 % ----- Maturite de degustation -----
 
 regle_rep(boire,1,
@@ -668,6 +745,13 @@ memoriser_vin(Vin) :-
     asserta(dernier_vin(Vin)).
 memoriser_vin(_).
 
+% ==============================================================================
+% SECTION: Heuristique d'accessibilite
+% Rôle: Extraire des indices textuels et decider si le vin est pret a boire.
+% Entrées: Identifiant de vin et textes associes (description/bouche).
+% Sorties: Decision ready/wait/mix/unknown et lignes d'explication.
+% Notes: NOTE: le scoring repose sur des mots-cles par sous-chaine, sensible aux variations.
+% ==============================================================================
 collect_observations(Vin,Observations) :-
     findall(obs(Side,Aspect,Source,Text),
        ( keyword_profile(Side,Aspect,Keyword),
@@ -912,6 +996,13 @@ drop_n(List,N,Rest) :-
    ;  Rest = []
    ).
 
+% ==============================================================================
+% SECTION: Accords mets-vins
+% Rôle: Proposer des appellations adapteees a un plat donne.
+% Entrées: Plat (atom) et groupes d'appellations par region.
+% Sorties: Lignes de reponse preformatees.
+% Notes: Les profils sont declares manuellement via profil_plat/3.
+% ==============================================================================
 % ----- Accords mets-vins -----
 
 profil_plat(canard,
@@ -1083,6 +1174,13 @@ humanize_label(Atom,Label) :-
     ;   Label = Atom
     ).
 
+% ==============================================================================
+% SECTION: Definitions d'appellations
+% Rôle: Donner une definition textuelle et gerer les synonymes d'appellations.
+% Entrées: Nom d'appellation tel que mentionne par l'utilisateur.
+% Sorties: Identifiant interne et paragraphes de definition.
+% Notes: normaliser_appellation/2 retire les apostrophes simples avant matching.
+% ==============================================================================
 % ----- Definition d'appellations -----
 
 definition_appellation(haut_medoc,
@@ -1131,6 +1229,13 @@ normaliser_appellation(AppAtom,Id) :-
         atomic_list_concat(Syn,'_',CleanAtom)
     ), !.
 
+% ==============================================================================
+% SECTION: Requetes par prix
+% Rôle: Filtrer les vins par intervalle de prix et formatter la reponse.
+% Entrées: Bornes Min/Max (nombre ou inf).
+% Sorties: Lignes listant les vins et leur prix.
+% Notes: Les vins sont tries par prix croissant via predsort/3.
+% ==============================================================================
 % ----------------------------------------------------------------%
 
 regle_rep(vins,1,
@@ -1238,6 +1343,14 @@ lvins_prix_min_max(Min,Max,Lvins) :-
 
 compare_prix(<, (_,P1), (_,P2)) :- P1 =< P2, !.
 compare_prix(>,_,_).
+
+% ==============================================================================
+% SECTION: Lecture et tokenisation brute
+% Rôle: Lire une question utilisateur et la convertir en liste d'atomes.
+% Entrées: Flux standard (ligne utilisateur).
+% Sorties: Liste d'atomes (mots/nombres) en minuscules, sans ponctuation.
+% Notes: Le nettoyage et la normalisation des caracteres se font plus bas.
+% ==============================================================================
 
 
 
@@ -1398,6 +1511,13 @@ extract_atomics_aux([C|Chars],[A|Atomics]) :-
 
 extract_atomics_aux([],[]).
 
+% ==============================================================================
+% SECTION: Nettoyage et normalisation des caracteres
+% Rôle: Supprimer la ponctuation et normaliser quelques caracteres UTF-8.
+% Entrées: Liste de codes ASCII/UTF-8 lue sur l'entree standard.
+% Sorties: Liste de codes normalises, sans ponctuation.
+% Notes: NOTE: la couverture UTF-8 est limitee a quelques sequences explicites.
+% ==============================================================================
 
 /*****************************************************************************/
 % clean_string(+String,-Cleanstring)
@@ -1555,6 +1675,13 @@ read_atomics(ListOfAtomics) :-
 	clean_string(String,Cleanstring),
 	extract_atomics(Cleanstring,ListOfAtomics).
 
+% ==============================================================================
+% SECTION: Patterns par defaut des vins
+% Rôle: Deriver des tokens a partir des noms de vins quand aucun synonyme explicite n'existe.
+% Entrées: Identifiant de vin et nom associe (nom/2).
+% Sorties: Liste de tokens variantisee pour le matching.
+% Notes: Les articles initiaux et les millesimes finaux peuvent etre supprimes.
+% ==============================================================================
 default_vin_pattern(Vin,Tokens) :-
     nom(Vin,Nom),
     atom_string(Nom,NomStr),
@@ -1600,6 +1727,13 @@ article_token(les).
 
 
 
+% ==============================================================================
+% SECTION: Ecriture de reponse
+% Rôle: Afficher une reponse en lignes avec gestion de la ponctuation.
+% Entrées: Listes de mots (tokens) a ecrire.
+% Sorties: Texte affiche sur la sortie standard.
+% Notes: Respecte la capitalisation et les espaces autour de la ponctuation.
+% ==============================================================================
 /* --------------------------------------------------------------------- */
 /*                                                                       */
 /*        ECRIRE_REPONSE : ecrit une suite de lignes de texte            */
@@ -1668,6 +1802,13 @@ espace(0).
 espace(N) :- N>0, Nn is N-1, write(' '), espace(Nn).
 
 
+% ==============================================================================
+% SECTION: Controle de session
+% Rôle: Determiner si l'utilisateur souhaite terminer la session.
+% Entrées: Liste de tokens de la derniere question.
+% Sorties: Succes/echec du predicat fin/1.
+% Notes: Utilise par la boucle principale pour arreter le dialogue.
+% ==============================================================================
 /* --------------------------------------------------------------------- */
 /*                                                                       */
 /*                            TEST DE FIN                                */
@@ -1677,6 +1818,13 @@ espace(N) :- N>0, Nn is N-1, write(' '), espace(Nn).
 fin(L) :- member(fin,L).
 
 
+% ==============================================================================
+% SECTION: Boucle principale
+% Rôle: Orchestrer la lecture, la reponse et l'affichage.
+% Entrées: Flux standard (questions utilisateur).
+% Sorties: Reponses ecrites sur la sortie standard.
+% Notes: Le predicat grandgousier/0 est le point d'entree interactif.
+% ==============================================================================
 /* --------------------------------------------------------------------- */
 /*                                                                       */
 /*                         BOUCLE PRINCIPALE                             */

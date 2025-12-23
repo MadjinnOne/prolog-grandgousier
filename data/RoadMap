@@ -1,6 +1,6 @@
 ## 0. Clarifier les objectifs fonctionnels (ce que le bot doit savoir faire)
 
-À terme, votre bot doit couvrir au minimum les familles de questions suivantes (celles explicitement conseillées comme base, puis l’extension)  :
+À terme, le bot doit couvrir au minimum les familles de questions suivantes (celles explicitement conseillées comme base, puis l’extension)  :
 
 1. Conseiller des vins d’une appellation/région
    Ex: « Quels vins de Bourgogne me conseillez-vous ? »
