@@ -1,0 +1,155 @@
+\documentclass[a4paper]{scrartcl}
+\usepackage{fvextra}
+
+% --- Langue & encodage ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[square,numbers]{natbib}
+\usepackage[french]{babel}
+
+% --- Mise en page & graphiques ---
+\usepackage[a4paper, margin=1cm]{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{setspace}
+\setlength{\parindent}{0pt}
+\usepackage{multicol}
+
+% --- Maths ---
+\usepackage{amsmath,amssymb,mathtools}
+
+% --- Liens ---
+\usepackage[colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue]{hyperref}
+
+% --- Natbib (si tu cites) ---
+
+
+% --- Cadres jolis (titre) ---
+\usepackage[framemethod=tikz]{mdframed}
+\mdfdefinestyle{mystyle}{%
+  linewidth=1.5mm,
+  roundcorner=10pt,
+  backgroundcolor=gray!10
+}
+
+% --- Couleurs & listings ---
+\usepackage{xcolor}
+\usepackage{listings}
+
+% --- Définition langage Prolog (listing) ---
+\lstdefinelanguage{Prolog}{
+  keywords={is, not, mod, div},
+  sensitive=true,
+  morecomment=[l]\%,
+  morestring=[b]"
+}
+
+% --- Style listings pour Prolog ---
+\lstdefinestyle{prologstyle}{
+  language=Prolog,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue}\bfseries,
+  commentstyle=\color{green!50!black},
+  stringstyle=\color{red},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  stepnumber=1,
+  numbersep=8pt,
+  frame=single,
+  framerule=0.5pt,
+  breaklines=true,
+  tabsize=2,
+  showstringspaces=false,
+  literate=
+    {é}{{\'e}}1 {è}{{\`e}}1 {à}{{\`a}}1 {ù}{{\`u}}1
+    {ê}{{\^e}}1 {â}{{\^a}}1 {î}{{\^i}}1 {ô}{{\^o}}1
+    {û}{{\^u}}1 {ç}{{\c{c}}}1
+}
+
+\begin{document}
+\setstretch{1.2}
+\pagenumbering{gobble}
+
+% ================= PAGE DE GARDE =================
+\begin{titlepage}
+  \begin{center}
+    \includegraphics[width=0.25\textwidth]{figures/unamur}\\[0.1cm]
+
+    \begin{mdframed}[style=mystyle]
+      \begin{center}
+        \vspace{0.3cm}
+        {\Huge \textbf{\scalebox{1.1}{Grandgousier}}} \vspace{0.5cm}
+
+        {\Huge \textbf{\scalebox{0.9}{Bot conseiller en vins}}} \\[0.5cm]
+        {\Large{\scalebox{0.9}{\textit{Rapport de projet IA \& programmation symbolique}}}}\\
+        \vspace{0.3cm}
+        {\normalsize \textsc{IHDCM036}}
+      \end{center}
+      \vspace{0.3cm}
+    \end{mdframed}
+
+    \vspace{0.4cm}
+
+    % -------- Image de couverture --------
+
+\begin{center}
+  \begin{tikzpicture}
+    \node[
+      inner sep=0pt,
+      rounded corners=3mm,
+      clip
+    ]{
+      \includegraphics[
+        width=0.95\linewidth,
+        height=0.38\textheight,
+        keepaspectratio
+      ]{figures/robot.png}
+    };
+  \end{tikzpicture}
+\end{center}
+
+ 
+
+    \textbf{Homez Gilles} \\
+    \textbf{Crotteux Mathieu} \\
+
+    % (Optionnel) Image
+    %\begin{center}
+    %\begin{tikzpicture}
+    %  \clip[rounded corners=10pt] (0,0) rectangle (\linewidth*0.45, 8cm);
+    %  \node[anchor=south west, inner sep=0pt] at (0,0)
+    %    {\includegraphics[width=0.5\textwidth]{figures/robot.png}};
+    %\end{tikzpicture}
+    %\end{center}
+
+    \vspace{0.2cm}
+
+    Année académique 2025--2026\\
+    Professeur : \textsc{Jean-Marie Jacquet}
+  \end{center}
+\end{titlepage}
+
+\newpage
+\tableofcontents
+\newpage
+\pagenumbering{arabic}
+
+% ================= CORPS =================
+\input{body.tex}
+
+% ================= BIBLIO (optionnel) =================
+%\newpage
+%\bibliographystyle{ACM-Reference-Format}
+%\bibliography{references}
+
+% ================= ANNEXES =================
+\newpage
+\appendix
+\addcontentsline{toc}{section}{Annexes}
+\input{appendix.tex}
+
+
+\end{document}

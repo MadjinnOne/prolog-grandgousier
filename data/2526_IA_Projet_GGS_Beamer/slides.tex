@@ -1,0 +1,156 @@
+% =========================
+% SLIDES.TEX (compile OK)
+% =========================
+
+\section{Objectif}
+\begin{frame}{Objectif}
+\begin{itemize}
+  \item Bot conversationnel en \textsc{Prolog} pour conseiller des vins.
+  \item Deux fonctions principales :
+  \begin{itemize}
+    \item recommander (appellation, prix, plats) ;
+    \item expliquer (nez, bouche, description, appellation).
+  \end{itemize}
+  \item Approche symbolique : mots-cles ponderes + regles + motifs.
+\end{itemize}
+\end{frame}
+
+\section{Architecture}
+\begin{frame}{Architecture generale}
+\begin{itemize}
+  \item Deux modules :
+  \begin{enumerate}
+    \item base de connaissances (faits) ;
+    \item moteur de dialogue (normalisation, regles, reponse).
+  \end{enumerate}
+  \item Chaine :
+  \texttt{read\_atomics/1} $\rightarrow$ \texttt{produire\_reponse/2} $\rightarrow$ \texttt{ecrire\_reponse/1}.
+\end{itemize}
+\end{frame}
+
+\section{Base de connaissances}
+\begin{frame}[fragile]{Base de connaissances : representation}
+\begin{itemize}
+  \item Identifiant stable par vin (atom Prolog).
+  \item Faits : \texttt{nom/2}, \texttt{prix/2}, \texttt{provenance/2}, \texttt{appellation/2}.
+  \item Textes : \texttt{nez/2}, \texttt{bouche/2}, \texttt{description/2} (listes de lignes).
+\end{itemize}
+
+\vspace{0.15cm}
+\begin{lstlisting}[style=prologstyle]
+nom(chambolle_musigny_premier_cru_2012,
+ 'Chambolle Musigny 1er Cru 2012 - Les Noirots').
+prix(chambolle_musigny_premier_cru_2012, 63.85).
+appellation(chambolle_musigny_premier_cru_2012, chambolle_musigny).
+provenance(chambolle_musigny_premier_cru_2012, bourgogne).
+\end{lstlisting}
+\end{frame}
+
+\section{Normalisation}
+\begin{frame}[fragile]{Normalisation de l'entree}
+\begin{itemize}
+  \item Objectif : rendre le matching robuste aux variantes d'ecriture.
+  \item Etapes :
+  \begin{itemize}
+    \item unifier les noms de vins (long/court/compact) ;
+    \item normaliser les appellations et les plats ;
+    \item decomposer certains tokens composes.
+  \end{itemize}
+\end{itemize}
+
+\vspace{0.15cm}
+\begin{lstlisting}[style=prologstyle]
+normaliser_question(Lin,Lout) :-
+  nom_vins_uniforme(Lin,L1),
+  normaliser_appellations_tokens(L1,L2),
+  normaliser_plats_tokens(L2,L3),
+  expand_compound_tokens(L3,L4),
+  maplist(normaliser_mot,L4,Lout).
+\end{lstlisting}
+\end{frame}
+
+\section{Moteur de regles}
+\begin{frame}[fragile]{Mots-cles ponderes et regles}
+\begin{itemize}
+  \item \texttt{mclef/2} priorise l'intention (nez/bouche > vin/vins).
+  \item Une regle : \texttt{regle\_rep(MotCle, Id, Pattern, Rep) :- Conditions.}
+  \item Matching : sous-liste dans la question normalisee.
+\end{itemize}
+
+\vspace{0.15cm}
+\begin{lstlisting}[style=prologstyle]
+mclef(nez,10).
+mclef(bouche,10).
+mclef(appellation,8).
+mclef(vins,5).
+
+regle_rep(nez,1,[quel,nez,presente,le,Vin],Rep) :-
+  nez(Vin,Rep), memoriser_vin(Vin).
+\end{lstlisting}
+\end{frame}
+
+\section{Contexte}
+\begin{frame}[fragile]{Contexte minimal : dernier vin}
+\begin{itemize}
+  \item Gere les questions elliptiques (ex. "puis-je le boire maintenant").
+  \item Memoire : \texttt{dernier\_vin/1} mis a jour quand un vin est cite.
+\end{itemize}
+
+\vspace{0.15cm}
+\begin{lstlisting}[style=prologstyle]
+:- dynamic dernier_vin/1.
+
+memoriser_vin(Vin) :-
+  retractall(dernier_vin(_)),
+  asserta(dernier_vin(Vin)).
+\end{lstlisting}
+\end{frame}
+
+\section{Tests}
+\begin{frame}[fragile]{Validation : tests automatises (plunit)}
+\begin{itemize}
+  \item Suite \texttt{plunit} :
+  \begin{itemize}
+    \item base (provenance/appellation pour chaque vin) ;
+    \item normalisation (formes compactes, variantes) ;
+    \item reponses (Bourgogne, prix, nez/bouche, plats, cas vides).
+  \end{itemize}
+\end{itemize}
+
+\vspace{0.15cm}
+\begin{lstlisting}[style=prologstyle]
+test(all_wines_have_taxonomy) :-
+  findall(V, nom(V,_), Vins),
+  forall(member(V,Vins),
+         (provenance(V,_), appellation(V,_))).
+\end{lstlisting}
+\end{frame}
+
+\section{Limites}
+\begin{frame}{Limites et perspectives}
+\begin{itemize}
+  \item Limites :
+  \begin{itemize}
+    \item couverture linguistique dependante des patterns ;
+    \item ambiguite si plusieurs mots-cles forts ;
+    \item heuristiques sensibles au lexique.
+  \end{itemize}
+  \item Pistes :
+  \begin{itemize}
+    \item enrichir synonymes et patrons ;
+    \item memoriser aussi le dernier filtre (appellation/prix) ;
+    \item scoring global avant choix final.
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\section{Conclusion}
+\begin{frame}{Conclusion}
+\begin{itemize}
+  \item Base riche + moteur de regles robuste.
+  \item Normalisation : comprehension fiable sans NLP complexe.
+  \item Tests \texttt{plunit} : fiabilite et non-regression.
+\end{itemize}
+\centering\vspace{0.4cm}
+\textbf{Merci !}
+\end{frame}

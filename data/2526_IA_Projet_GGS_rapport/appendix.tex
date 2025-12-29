@@ -1,0 +1,219 @@
+\section{Patrons de formulation (\texttt{regle\_rep/4})}
+\label{ann:patterns}
+Cette section recense de manière exhaustive les patrons (listes de tokens) reconnus par le bot au niveau des règles \texttt{regle\_rep/4}, regroupés par type de question.
+Les variables suivantes désignent :
+\begin{itemize}
+  \item \texttt{Vin} : un vin (nom d'une entrée de la base),
+  \item \texttt{App} : une appellation,
+  \item \texttt{Plat} : un plat (ou ingrédient),
+  \item \texttt{X, Y, Min, Max} : des nombres (prix),
+  \item \texttt{Det} : un déterminant/segment optionnel (ex. \texttt{le}, \texttt{ce}, etc.).
+\end{itemize}
+
+
+\footnotesize
+\begin{multicols}{2}
+
+\subsection{Bouche d'un vin}
+\begin{verbatim}
+[que, donne, le, Vin, en, bouche]
+[que, donne, Vin, en, bouche]
+[comment, est, Vin, en, bouche]
+[que, donne, Vin, en, bouche, '?']
+[bouche, de, Vin]
+\end{verbatim}
+
+\subsection{Nez d'un vin}
+\begin{verbatim}
+[quel, nez, presente, le, Vin]
+[quel, nez, presente, Vin]
+[quel, nez, pour, Vin]
+[quel, nez, pour, Vin, '?']
+[nez, de, Vin]
+\end{verbatim}
+
+\subsection{Description d'un vin /  appellation}
+\begin{verbatim}
+[pourriezvous, men, dire, plus, sur, le, Vin]
+[pourriezvous, men, dire, plus, sur, Vin]
+[pourriez, men, dire, plus, sur, le, Vin]
+[pourriez, men, dire, plus, sur, Vin]
+[que, pouvezvous, me, dire, sur, le, Vin]
+[parlez, moi, du, Vin]
+[parlez, moi, de, Vin]
+[parle, moi, du, Vin]
+[parlezvous, du, Vin]
+\end{verbatim}
+
+\subsection{Recommandations par appellation}
+\begin{verbatim}
+[quels, vins, de, App, me, conseillezvous]
+[quels, vins, de, App, me, conseillez, vous]
+[auriezvous, des, vins, de, App]
+[avezvous, des, vins, de, App]
+[quel, vin, de, App, me, conseillezvous]
+[quel, vin, de, App, me, conseillez, vous]
+[vous, auriez, un, App]
+[vous, auriez, des, App]
+[auriez, vous, un, App]
+[auriez, vous, des, App]
+\end{verbatim}
+
+\subsection{Autres vins d'une appellation}
+\begin{verbatim}
+[auriezvous, dautres, vins, de, App]
+[auriezvous, d, autres, vins, de, App]
+[auriez, vous, d, autres, vins, de, App]
+[auriezvous, autres, vins, de, App]
+[auriez, vous, autres, vins, de, App]
+\end{verbatim}
+
+\subsection{Accessibilité / ''prêt à boire''}
+\begin{verbatim}
+[est, ce, un, vin, que, je, peux, boire, tout, de, 
+suite, Vin]
+[est, ce, un, vin, que, je, peux, boire, tout, de, suite, 
+Det, Vin]
+[est, ce, que, je, peux, boire, Vin, tout, de, suite]
+[est, ce, que, je, peux, boire, Det, Vin, tout, de, suite]
+[est, ce, que, je, peux, boire, Vin, maintenant]
+[est, ce, que, je, peux, boire, Det, Vin, maintenant]
+[puis, je, boire, Vin, maintenant]
+[puis, je, boire, Det, Vin, maintenant]
+[puis, je, deja, boire, Vin]
+[puis, je, deja, boire, Det, Vin]
+[je, peux, deja, boire, Vin]
+[je, peux, deja, boire, Det, Vin]
+[peut, on, boire, Vin, tout, de, suite]
+[peut, on, boire, Det, Vin, tout, de, suite]
+[peut, on, boire, Vin, maintenant]
+[peut, on, boire, Det, Vin, maintenant]
+[Vin, est, il, pret, a, boire]
+[Det, Vin, est, il, pret, a, boire]
+[je, peux, boire, Vin, tout, de, suite]
+[je, peux, boire, Det, Vin, tout, de, suite]
+[je, peux, boire, Vin, maintenant]
+[je, peux, boire, Det, Vin, maintenant]
+[est, ce, un, vin, que, je, peux, boire, tout, de, suite]
+[est, ce, un, vin, que, je, peux, boire, maintenant]
+[est, ce, que, je, peux, le, boire, tout, de, suite]
+[est, ce, que, je, peux, le, boire, maintenant]
+\end{verbatim}
+
+\subsection{Filtrage par prix}
+\begin{verbatim}
+[auriezvous, des, vins, entre, X, et, Y, eur]
+[auriez, vous, des, vins, entre, X, et, Y, eur]
+[avezvous, des, vins, entre, X, et, Y, euros]
+[avez, vous, des, vins, entre, X, et, Y, euros]
+[auriezvous, des, vins, entre, X, et, Y]
+[auriez, vous, des, vins, entre, X, et, Y, euros]
+[auriezvous, des, vins, entre, X, et, Y, euros]
+[avezvous, des, vins, a, moins, de, Max, euros]
+[avezvous, des, vins, a, moins, de, Max]
+[avezvous, des, vins, a, plus, de, Min, euros]
+[avezvous, des, vins, a, plus, de, Min]
+[des, vins, a, moins, de, Max, euros]
+[des, vins, a, moins, de, Max]
+[des, vins, a, plus, de, Min, euros]
+[des, vins, a, plus, de, Min, eur]
+[des, vins, a, plus, de, Min]
+\end{verbatim}
+
+\end{multicols}
+
+\subsection{Accords mets--vins}
+\begin{verbatim}
+[je, cuisine, du, Plat, quel, vin, me, conseillezvous]
+[je, cuisine, des, Plat, quel, vin, me, conseillezvous]
+[Plat, quel, vin, me, conseillezvous]
+[je, fais, un, Plat, quel, vin, servir]
+[quel, vin, avec, du, Plat]
+[quel, vin, avec, des, Plat]
+[quel, vin, pour, Plat]
+\end{verbatim}
+
+\subsection{Définition d'une appellation}
+\begin{verbatim}
+[que, recouvre, appellation, App]
+[que, recouvre, appellation, App, '?']
+[que, recouvre, l, ''', appellation, App]
+[que, recouvre, l, ''', appellation, App, '?']
+\end{verbatim}
+
+\subsection{Fin de session}
+\begin{verbatim}
+[fin]
+\end{verbatim}
+
+
+\normalsize
+\newpage
+\section{Flux d’exécution}
+\label{ann:produire}
+\begin{footnotesize}
+    
+    
+
+\begin{verbatim}
+grandgousier/0
+  ↓
+lire_question/1
+  ↓
+normaliser_question/2
+  ↓
+produire_reponse/2
+     ├─ (A) Préparation / repérage
+     │     ├─ normaliser_question/2
+     │     └─ mclef/2 + member/2
+     │          → repère un “mot-clé” présent dans la question normalisée
+     │
+     ├─ (B) Sélection d’une règle de dialogue
+     │     ├─ clause/2 sur regle_rep/4
+     │     │     → récupère une règle candidate associée au mot-clé détecté
+     │     └─ match_pattern/2
+     │           → vérifie que le patron de mots attendu est bien présent
+     │
+     ├─ (C) Exécution de l’action (le vrai contenu de la réponse)
+     │     └─ call(Body)
+     │           → déclenche UN des “constructeurs” de réponse suivants (selon la règle)
+     │
+     │        1) Réponses de dégustation (vin explicite)
+     │           ├─ bouche_reponse/2
+     │           └─ nez_reponse/2
+     │              ↳ s’appuient sur base_vins : bouche/2, nez/2 (+ mise en forme)
+     │              ↳ appellent souvent memoriser_vin/1 pour le contexte
+     │
+     │        2) Réponse « parle / parlez-moi de … »
+     │           └─ description_ou_appellation/2
+     │              ↳ si on reconnaît un vin : description/2
+     │              ↳ sinon : bascule vers definition_appellation/2
+     │
+     │        3) Recommandations / listes de vins
+     │           ├─ reponse_conseil/3
+     │           │    ↳ récupère des contraintes (appellation, etc.)
+     │           │    ↳ filtre/sélectionne des vins via base_vins
+     │           │    ↳ limite le nombre de résultats
+     │           └─ repondre_vins_prix/...
+     │                ↳ cas typiques « moins / plus ... euros »
+     │
+     │        4) Accords mets–vins (plats)
+     │           └─ reponse_plat/2
+     │              ↳ construit un profil de plat
+     │              ↳ transforme en recommandations
+     │              ↳ formate la sortie
+     │
+     │        5) « Puis-je le boire maintenant ? »
+     │           └─ reponse_accessibilite/2
+     │              ↳ utilise dernier_vin/1 si nécessaire
+     │              ↳ applique une heuristique de scoring
+     │
+     └─ (D) Cas d’échec (fallback)
+           → aucune règle ne correspond
+  ↓
+ecrire_reponse/1
+\end{verbatim}
+
+\end{footnotesize}
+
+

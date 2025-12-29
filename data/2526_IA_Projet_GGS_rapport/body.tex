@@ -1,0 +1,491 @@
+% ================= INTRODUCTION =================
+\section{Introduction}
+
+Ce rapport présente le projet \textbf{Grandgousier}, un agent conversationnel écrit en
+\textsc{Prolog} dont l’objectif est de conseiller des vins et de fournir des informations
+œnologiques à partir d’une base de connaissances structurée.
+
+Le système repose sur une approche de \emph{programmation symbolique} :
+les requêtes de l’utilisateur sont analysées sous forme de listes de mots,
+des mots-clés pondérés permettent d’identifier l’intention principale,
+et des règles Prolog déclenchent la réponse la plus appropriée.
+Cette approche s’inspire directement du programme \emph{Eliza},
+tout en étant adaptée au domaine spécifique du vin.
+
+\paragraph{Objectifs du projet}
+\begin{itemize}
+  \item Construire une base de connaissances œnologique cohérente
+        (vins, appellations, prix, descriptions, nez, bouche).
+  \item Mettre en œuvre un moteur de dialogue basé sur des règles
+        et des mots-clés pondérés.
+  \item Reproduire fidèlement les dialogues exigés dans l’énoncé du projet.
+  \item Illustrer les principes fondamentaux de la programmation symbolique
+        appliquée à un agent conversationnel.
+\end{itemize}
+
+\paragraph{Organisation du rapport}
+La section~\ref{sec:archi} décrit l’architecture générale du système.
+La section~\ref{sec:bd} détaille la base de connaissances.
+La section~\ref{sec:moteur} présente le moteur de règles et le traitement de l’entrée utilisateur.
+La section~\ref{sec:dialogues} illustre le fonctionnement du système par des exemples concrets.
+Enfin, la section~\ref{sec:conclusion} conclut et propose des pistes d’amélioration.
+
+% ================= ARCHITECTURE =================
+\section{Architecture générale du système}
+\label{sec:archi}
+
+\subsection{Vue d’ensemble}
+
+Le programme est structuré en deux parties principales :
+\begin{itemize}
+  \item une \textbf{base de connaissances} contenant les faits œnologiques ;
+  \item un \textbf{moteur de dialogue} chargé d’analyser les questions
+        et de produire les réponses.
+\end{itemize}
+
+Cette séparation claire permet d’isoler les données du raisonnement,
+ce qui facilite l’extension de la base ou l’ajout de nouvelles règles
+sans modifier l’architecture globale.
+
+\subsection{Boucle principale et entrées/sorties}
+
+Le point d’entrée du programme repose sur une boucle de dialogue :
+\begin{itemize}
+  \item lecture de la question utilisateur sous forme de liste de mots
+        (via \texttt{read\_atomics/1}) ;
+  \item génération d’une réponse structurée
+        (via \texttt{produire\_reponse/2}) ;
+  \item affichage de la réponse formatée
+        (via \texttt{ecrire\_reponse/1}).
+\end{itemize}
+
+La boucle s’interrompt lorsque l’utilisateur introduit le mot-clé
+\texttt{fin}.
+
+\begin{lstlisting}[style=prologstyle, caption={Extrait de la production de réponse}]
+produire_reponse([fin],[L1]) :-
+  L1 = [merci, de, m, '\'', avoir, consulte], !.
+\end{lstlisting}
+
+% ================= BASE DE CONNAISSANCES =================
+\newpage
+\section{Base de connaissances œnologique}
+\label{sec:bd}
+
+\subsection{Représentation des vins}
+
+Chaque vin est identifié par un identifiant Prolog stable
+(ex. \texttt{chambolle\_musigny\_premier\_cru\_2012}).
+Les informations sont représentées par des faits indépendants :
+
+\begin{itemize}
+  \item \texttt{nom(Id, NomLisible)}
+  \item \texttt{prix(Id, Prix)}
+  \item \texttt{provenance(Id, Region)}
+  \item \texttt{appellation(Id, Appellation)}
+  \item \texttt{nez(Id, Texte)}
+  \item \texttt{bouche(Id, Texte)}
+  \item \texttt{description(Id, Texte)}
+\end{itemize}
+
+Cette modélisation permet un accès flexible aux informations
+et favorise la réutilisation des données dans plusieurs règles.
+
+\begin{lstlisting}[style=prologstyle, caption={Exemples de faits de la base de connaissances}]
+nom(chambolle_musigny_premier_cru_2012,
+    'Chambolle Musigny 1er Cru 2012 - Les Noirots').
+
+prix(chambolle_musigny_premier_cru_2012, 63.85).
+appellation(chambolle_musigny_premier_cru_2012, chambolle_musigny).
+provenance(chambolle_musigny_premier_cru_2012, bourgogne).
+\end{lstlisting}
+
+\subsection{Accords mets-vins}
+
+Le système prend également en compte des plats typiques
+(canard, carbonnade, poisson, etc.).
+Ces plats sont normalisés vers des identifiants uniques,
+ce qui permet d’associer plusieurs formulations à un même concept.
+
+Les recommandations sont alors produites à partir de règles
+plutôt que d’une analyse linguistique complète,
+ce qui correspond à l’esprit du projet.
+
+% ================= MOTEUR DE REGLES =================
+\section{Moteur de règles et compréhension d’entrée}
+\label{sec:moteur}
+
+\subsection{Normalisation de l’entrée}
+
+L’entrée utilisateur est transformée en une liste de mots en minuscules.
+Avant l’appariement des règles, plusieurs normalisations sont appliquées :
+\begin{itemize}
+  \item reconnaissance des noms de vins (formes longues, abrégées, collées) ;
+  \item normalisation des appellations ;
+  \item reconnaissance des plats ;
+  \item décomposition de tokens composés (\texttt{estceque}, \texttt{puisje}, etc.).
+\end{itemize}
+
+Cette étape rend le système robuste face aux variations de formulation.
+
+\begin{lstlisting}[style=prologstyle, caption={Pipeline de normalisation}]
+normaliser_question(Lmots,L_out) :-
+  nom_vins_uniforme(Lmots,Ltmp),
+  normaliser_appellations_tokens(Ltmp,Lapp),
+  normaliser_plats_tokens(Lapp,Lplats),
+  expand_compound_tokens(Lplats,Lsplit),
+  maplist(normaliser_mot,Lsplit,L_out).
+\end{lstlisting}
+
+\subsection{Mots-clés pondérés}
+
+Les mots-clés sont associés à des poids grâce au prédicat
+\texttt{mclef/2}.  
+Ces poids permettent de prioriser les intentions les plus informatives
+(par exemple \texttt{nez} ou \texttt{bouche})
+par rapport à des mots plus génériques.
+
+\begin{lstlisting}[style=prologstyle, caption={Exemples de mots-clés pondérés}]
+mclef(nez,10).
+mclef(bouche,10).
+mclef(vin,5).
+mclef(vins,5).
+mclef(appellation,8).
+mclef(canard,8).
+\end{lstlisting}
+
+\subsection{Règles de réponse}
+
+Une règle de réponse est définie par le prédicat :
+
+\[
+\texttt{regle\_rep(MotCle, Priorite, Pattern, Reponse)}.
+\]
+
+Le \texttt{Pattern} est recherché comme sous-liste dans la question
+normalisée, et la \texttt{Reponse} est construite à partir de la base
+de connaissances.
+
+\begin{lstlisting}[style=prologstyle, caption={Règle pour une question sur le nez d’un vin}]
+regle_rep(nez,1,
+  [ quel, nez, presente, le, Vin ],
+  Rep) :-
+  nez(Vin,Rep),
+  memoriser_vin(Vin).
+\end{lstlisting}
+
+\subsection{Sélection de la règle}
+
+Le moteur :
+\begin{enumerate}
+  \item identifie les mots-clés présents ;
+  \item sélectionne les règles associées ;
+  \item choisit la première règle compatible avec le pattern
+        et les conditions.
+\end{enumerate}
+
+Ce mécanisme simple est suffisant pour produire
+des dialogues cohérents et déterministes.
+
+% ================= CONTEXTE =================
+\section{Mémoire et suivi de contexte}
+\label{sec:contexte}
+
+Afin de gérer des questions dépendantes du contexte
+(ex. « Puis-je le boire maintenant ? »),
+le système mémorise le dernier vin mentionné.
+
+\begin{lstlisting}[style=prologstyle, caption={Gestion du contexte}]
+:- dynamic dernier_vin/1.
+
+memoriser_vin(Vin) :-
+  retractall(dernier_vin(_)),
+  asserta(dernier_vin(Vin)).
+\end{lstlisting}
+
+Cette mémoire minimale améliore la fluidité du dialogue
+sans complexifier excessivement le moteur.
+
+% ================= EXEMPLES =================
+\section{Exemples de dialogues}
+\label{sec:dialogues}
+
+\subsection{Recommandation par région}
+
+\begin{quote}
+Utilisateur : Quels vins de bourgogne me conseillez vous \\
+Système : Voici quelques vins de bourgogne que je peux vous proposer :
+\end{quote}
+
+\subsection{Demande de variantes}
+
+\begin{quote}
+Utilisateur : auriez vous d autres vins de bourgogne \\
+Système : J'ai aussi d'autres vins de bourgogne à vous proposer :
+\end{quote}
+
+\subsection{Questions œnologiques}
+
+\begin{quote}
+Utilisateur : quel nez presente le chambolle musigny \\
+Système : Nez complexe, intense de fruits rouges et d'épices.
+\end{quote}
+
+\subsection{Appellation}
+
+\begin{quote}
+Utilisateur : que recouvre l appellation haut medoc \\
+Système : Description d'un vin représentatif de l'appellation.
+\end{quote}
+
+% ================= TESTS & VALIDATION =================
+\section{Validation, tests et limites}
+\label{sec:tests}
+
+\subsection{Stratégie de validation}
+
+La validation du système \textbf{Grandgousier} repose sur une combinaison
+de tests automatisés et de scénarios de dialogue inspirés de l’énoncé officiel.
+Contrairement à une validation purement manuelle, nous avons mis en place
+une véritable suite de tests unitaires en \textsc{Prolog}, basée sur la bibliothèque
+\texttt{plunit}.
+
+Ces tests couvrent à la fois :
+\begin{itemize}
+  \item la cohérence de la base de connaissances œnologique ;
+  \item la robustesse de la normalisation linguistique ;
+  \item le bon déclenchement des règles de réponse ;
+  \item la conformité des réponses produites avec les dialogues attendus.
+\end{itemize}
+
+L’ensemble des tests est regroupé dans une phase de test dédiée,
+chargée automatiquement avec le moteur principal.
+
+\subsection{Tests sur la base de connaissances}
+
+Une première série de tests vise à vérifier l’intégrité de la base de faits.
+Ces tests garantissent que chaque vin possède bien une provenance
+et une appellation, et que les informations essentielles sont présentes.
+
+\begin{itemize}
+  \item vérification de l’existence des faits \texttt{provenance/2} et \texttt{appellation/2} ;
+  \item cohérence taxonomique : chaque vin déclaré par \texttt{nom/2}
+        possède une provenance et une appellation ;
+  \item validation de faits spécifiques attendus par les dialogues de l’énoncé
+        (ex. \emph{La Fleur de Pomys}, \emph{Hermitage rouge 2007}).
+\end{itemize}
+
+Ces tests permettent de détecter immédiatement une base incomplète
+ou incohérente lors de l’ajout de nouveaux vins.
+
+\newpage
+\subsection{Tests de normalisation linguistique}
+
+Une part importante de la robustesse du système repose sur la normalisation
+des entrées utilisateur. Plusieurs tests unitaires vérifient que des formulations
+variées mènent au même identifiant interne.
+
+Les cas testés incluent notamment :
+\begin{itemize}
+  \item noms de vins sans millésime explicite
+        (\emph{« nuits saint georges »}) ;
+  \item formes compactées
+        (\emph{« nuitssaintgeorges »}, \emph{« lafleurdepomys »}) ;
+  \item variantes avec ou sans déterminant ;
+  \item reconnaissance des premiers crus et millésimes.
+\end{itemize}
+
+Ces tests confirment que la normalisation produit systématiquement
+les identifiants Prolog attendus, indépendamment de la formulation exacte
+employée par l’utilisateur.
+
+\subsection{Tests des règles de réponse}
+
+Le cœur du moteur repose sur les règles \texttt{regle\_rep/4}.
+Celles-ci sont validées par des tests qui comparent directement
+la réponse produite avec la réponse attendue.
+
+Les catégories testées comprennent :
+\begin{itemize}
+  \item questions sur le \textbf{nez} et la \textbf{bouche} d’un vin,
+        y compris les formes longues et abrégées ;
+  \item demandes de description détaillée
+        (\emph{« parlez-moi de »}, \emph{« pourriez-vous m’en dire plus sur »}) ;
+  \item recommandations par \textbf{appellation} (Bourgogne, Graves, Saint-Émilion) ;
+  \item gestion des variantes
+        (\emph{« d’autres vins »}, absence de vins supplémentaires) ;
+  \item recommandations par \textbf{plats}
+        (canard, bœuf, poisson, boulets liégeois).
+\end{itemize}
+
+Les tests vérifient non seulement la présence des vins attendus,
+mais également le format exact des réponses, compatible avec
+le prédicat \texttt{ecrire\_reponse/1}.
+
+\subsection{Tests sur les contraintes de prix}
+
+Des tests spécifiques sont consacrés aux recommandations
+fondées sur des contraintes numériques :
+\begin{itemize}
+  \item intervalle de prix (\emph{entre 20 et 35 euros}) ;
+  \item prix minimum (\emph{moins de 10 euros}) ;
+  \item prix maximum (\emph{plus de 60 euros}) ;
+  \item absence de résultats dans une gamme donnée.
+\end{itemize}
+
+Ces tests confirment que les prédicats de sélection par prix
+fonctionnent correctement et retournent des réponses explicites
+lorsqu’aucun vin ne correspond aux critères.
+
+\subsection{Validation globale et non-régression}
+
+L’exécution complète de la suite de tests permet de valider
+le comportement global du système après chaque modification.
+Elle joue le rôle de test de non-régression : toute modification
+du moteur ou de la base de connaissances qui casserait un dialogue
+existant est immédiatement détectée.
+
+Cette approche renforce considérablement la fiabilité du prototype
+et facilite son évolution.
+
+\newpage
+\subsection{Limites et pistes d’amélioration}
+
+Malgré une couverture fonctionnelle étendue, certaines limites subsistent :
+
+\begin{itemize}
+  \item \textbf{Couverture linguistique bornée} :
+        les questions hors patrons explicitement codés
+        peuvent ne pas être comprises.
+  \item \textbf{Désambiguïsation limitée} :
+        plusieurs intentions peuvent partager des mots-clés similaires,
+        ce qui dépend fortement de l’ordre et du poids des règles.
+  \item \textbf{Heuristiques dépendantes du lexique} :
+        certaines extensions (ex. maturité de dégustation)
+        reposent sur la présence de mots-clés textuels.
+\end{itemize}
+
+Parmi les pistes d’amélioration possibles :
+\begin{itemize}
+  \item enrichissement des synonymes et des patrons linguistiques ;
+  \item renforcement du contexte de dialogue
+        (mémorisation des filtres et des vins déjà proposés) ;
+  \item ajout de nouvelles phases de tests unitaires
+        pour couvrir des dialogues plus complexes.
+\end{itemize}
+
+%--------------------------------------------------
+
+\section{Déroulement séquentiel du raisonnement dans \texttt{produire\_reponse/2}}
+
+Une fois la question lue et transformée en liste de mots par les prédicats fournis (\texttt{lire\_question/1} et \texttt{read\_atomics/1}), le raisonnement proprement dit commence dans le prédicat \texttt{produire\_reponse/2}.  
+Ce prédicat traite la question de manière strictement séquentielle, selon les étapes décrites ci-dessous.
+
+\subsection{Entrée dans \texttt{produire\_reponse/2}}
+
+À l’entrée de \texttt{produire\_reponse/2}, la question n’est plus une chaîne de caractères mais une liste de tokens.  
+Par exemple, pour la question utilisateur :
+
+\begin{quote}
+\emph{« Est-ce que je peux boire le Chablis 2019 maintenant ? »}
+\end{quote}
+
+la représentation initiale est de la forme :
+\begin{verbatim}
+[est, ce, que, je, peux, boire, le, chablis, 2019, maintenant]
+\end{verbatim}
+
+\subsection{Normalisation de la question}
+
+La première étape effectuée dans \texttt{produire\_reponse/2} est l’appel au prédicat \texttt{normaliser\_question/2}.  
+Cette étape transforme la liste brute de tokens en une forme standardisée, appelée \emph{question normalisée}.
+
+Dans l’exemple précédent, la normalisation conduit typiquement à :
+\begin{verbatim}
+Qn = [est, ce, que, je, peux, boire, Vin, maintenant]
+\end{verbatim}
+
+où le nom du vin reconnu est remplacé par la variable logique \texttt{Vin}.  
+À partir de ce point, \texttt{produire\_reponse/2} ne travaille plus jamais sur la question brute, mais uniquement sur la question normalisée \texttt{Qn}.
+
+\subsection{Identification des mots-clés}
+
+Une fois la question normalisée obtenue, \texttt{produire\_reponse/2} parcourt la liste \texttt{Qn} afin d’identifier les mots-clés qu’elle contient.  
+Un mot est considéré comme mot-clé s’il apparaît dans les faits \texttt{mclef/2}.
+
+Dans l’exemple :
+\begin{verbatim}
+Qn = [est, ce, que, je, peux, boire, Vin, maintenant]
+\end{verbatim}
+
+les mots-clés détectés sont notamment :
+\begin{verbatim}
+boire -> poids 8
+vin   -> poids 5
+\end{verbatim}
+
+\subsection{Sélection du mot-clé dominant}
+
+Parmi les mots-clés présents dans la question normalisée, \texttt{produire\_reponse/2} sélectionne celui dont le poids est le plus élevé.  
+Ce mot-clé est considéré comme le plus discriminant pour déterminer le type de question posée.
+
+Dans l’exemple, le mot-clé dominant est :
+\begin{verbatim}
+boire
+\end{verbatim}
+
+Le rôle de ce mot-clé n’est pas de produire la réponse, mais d’orienter la recherche vers une famille pertinente de règles.
+
+\subsection{Recherche des règles correspondantes}
+
+Une fois le mot-clé dominant déterminé, \texttt{produire\_reponse/2} recherche les règles de dialogue associées à ce mot-clé à l’aide du prédicat \texttt{regle\_rep/4}.  
+Seules les règles liées au mot-clé sélectionné sont considérées.
+
+Chaque règle contient un patron décrivant une forme possible de question.
+
+\subsection{Vérification du patron}
+
+Pour chaque règle candidate, \texttt{produire\_reponse/2} vérifie si le patron de la règle est présent dans la question normalisée \texttt{Qn}.  
+Cette vérification est réalisée par le prédicat \texttt{match\_pattern/2}, qui teste si le patron est une sous-liste de \texttt{Qn}.
+
+La première règle dont le patron correspond est retenue, conformément au mécanisme de résolution standard de Prolog basé sur l’ordre des clauses.
+
+\subsection{Exécution de l’action associée}
+
+Lorsque la règle est validée, l’action associée est exécutée.  
+Cette action déclenche un prédicat spécialisé chargé de construire la réponse (par exemple \texttt{reponse\_accessibilite/2} dans le cas présent).
+
+Ces prédicats interrogent la base de connaissances \texttt{base\_vins.pl}, produisent les lignes de réponse et mettent éventuellement à jour le contexte du dialogue, notamment via le prédicat \texttt{dernier\_vin/1}.
+
+\subsection{Cas d’échec}
+
+Si aucun mot-clé pertinent n’est détecté ou si aucune règle associée ne correspond à la question normalisée, \texttt{produire\_reponse/2} génère une réponse par défaut indiquant que la question n’a pas été comprise.
+
+
+
+
+% ================= CONCLUSION =================
+\section{Conclusion}
+\label{sec:conclusion}
+Le projet \textbf{Grandgousier} illustre efficacement
+les principes de la programmation symbolique appliqués
+à un agent conversationnel.
+
+Il met en œuvre :
+\begin{itemize}
+  \item une base de connaissances riche et structurée ;
+  \item un moteur de règles fondé sur des mots-clés pondérés ;
+  \item un mécanisme simple mais efficace de suivi de contexte.
+\end{itemize}
+
+Le système répond aux exigences de l’énoncé et va même au-delà,
+notamment grâce à l’heuristique d’évaluation de la maturité des vins.
+Des améliorations futures pourraient inclure une gestion
+plus fine des ambiguïtés linguistiques ou une extension
+du contexte de dialogue.
+
+La liste exhaustive des patrons reconnus par les règles \texttt{regle\_rep/4},
+ainsi qu’un schéma détaillé du déroulement de \texttt{produire\_reponse/2},
+sont fournis en annexe (Annexe~\ref{ann:patterns} et Annexe~\ref{ann:produire}).
+
+\newpage

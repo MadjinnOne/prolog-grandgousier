@@ -1,0 +1,124 @@
+\documentclass[aspectratio=169]{beamer}
+
+% ================= LANGUE / ACCENTS (pdfLaTeX) =================
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+
+
+
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{listings}
+
+% ================= THEME =================
+\usetheme{Madrid}
+\usecolortheme{default}
+\setbeamertemplate{navigation symbols}{}
+
+% ================= PROLOG LISTINGS =================
+\lstdefinelanguage{Prolog}{
+  keywords={is, not, mod, div},
+  sensitive=true,
+  morecomment=[l]\%,
+  morestring=[b]"
+}
+
+\lstdefinestyle{prologstyle}{
+  language=Prolog,
+  basicstyle=\ttfamily\scriptsize,
+  keywordstyle=\color{blue}\bfseries,
+  commentstyle=\color{gray},
+  stringstyle=\color{black},
+  numbers=none,
+  frame=single,
+  framerule=0.3pt,
+  breaklines=true,
+  tabsize=2,
+  showstringspaces=false,
+  columns=fullflexible,
+  literate=
+    {é}{{\'e}}1 {è}{{\`e}}1 {à}{{\`a}}1 {ù}{{\`u}}1
+    {ê}{{\^e}}1 {â}{{\^a}}1 {î}{{\^i}}1 {ô}{{\^o}}1
+    {û}{{\^u}}1 {ç}{{\c{c}}}1 {É}{{\'E}}1 {œ}{{oe}}1 {Œ}{{OE}}1
+}
+
+
+
+
+% ================= INFOS =================
+\title[Grandgousier]{Grandgousier}
+\subtitle{Bot conseiller en vins — Prolog}
+\author{Gilles Homez \and Mathieu Crotteux}
+
+% >>> IMPORTANT : institute court pour le pied de page
+\institute[IHDCM036]{IHDCM036}
+
+\date{Année académique 2025--2026}
+
+\begin{document}
+
+% ================= PAGE DE GARDE =================
+\begin{frame}[plain]
+
+\vspace*{0.2cm}
+
+\begin{center}
+
+\noindent
+\hspace{1.5cm}\begin{minipage}[t]{0.15\textwidth}
+  \vspace{30pt}%
+  \includegraphics[width=1.5\linewidth]{figures/unamur}
+\end{minipage}\hspace{0cm}
+\begin{minipage}[t]{0.7\textwidth}
+  \vspace{5pt}%
+  \centering
+  {\LARGE \textbf{Grandgousier}}\par
+  \vspace{0.1cm}
+  {\large Bot conseiller en vins (Prolog)}\par
+  \vspace{0.1cm}
+
+  % >>> VERSION LONGUE UNIQUEMENT SUR LA GARDE
+  {\footnotesize IA \& programmation symbolique — IHDCM036}\par
+
+  \vspace{0.25cm}
+
+  \centering
+  \begin{tikzpicture}
+    \node[
+      inner sep=0pt,
+      rounded corners=3mm,
+      clip
+    ]{
+      \includegraphics[
+        width=0.95\linewidth,
+        height=0.48\textheight,
+        keepaspectratio
+      ]{figures/robot.png}
+    };
+  \end{tikzpicture}
+
+  \vspace{0.2cm}
+
+  {\footnotesize
+  Gilles Homez - Mathieu Crotteux\par
+  Professeur : Jean-Marie Jacquet
+  }
+
+\end{minipage}
+
+\end{center}
+
+\end{frame}
+
+
+% ================= PLAN =================
+\begin{frame}{Plan}
+\tableofcontents
+\end{frame}
+
+% ================= CONTENU =================
+\input{slides.tex}
+
+\end{document}
