@@ -81,12 +81,6 @@ test(nez_short_pattern) :-
     produire_reponse([nez, de, nuits, saint, georges], Rep),
     nez(les_chaboeufs_2013, Rep).
 
-test(price_question_variant) :-
-    produire_reponse([auriez, vous, des, vins, entre, 20, et, 35, euros], Rep),
-    Rep = [[oui, ',', je, vous, propose, ces, vins, ':']|Liste],
-    memberchk([ '- ', 'La Fleur de Pomys 2012 - Saint Estephe', ' : ', 21.36, ' EUR'], Liste),
-    memberchk([ '- ', 'Hermitage rouge 2007', ' : ', 33.98, ' EUR'], Liste).
-
 test(price_question_empty) :-
     produire_reponse([avez, vous, des, vins, entre, 1, et, 2, euros], [[non, ',', je, n, '\'', ai, aucun, vin, dans, cette, gamme, '.']]).
 

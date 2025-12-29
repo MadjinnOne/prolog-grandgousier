@@ -48,32 +48,35 @@ produire_reponse([fin],[L1]) :-
 produire_reponse(L,Rep) :-
    normaliser_question(L,L_norm),
 %   write(L_norm),
-   mot_clef_dominant(L_norm,M),
-   clause(regle_rep(M,_,Pattern,Rep),Body),
-   match_pattern(Pattern,L),
-   call(Body), !.
+   mots_cle_ordonnes(L_norm,MotsCle),
+   essayer_mots_cle(MotsCle,L,Rep), !.
 
 produire_reponse(_,[L1,L2, L3]) :-
    L1 = [je, ne, sais, pas, '.'],
    L2 = [les, etudiants, vont, m, '\'', aider, '.' ],
    L3 = ['vous le verrez !'].
 
-% Selectionner le mot-cle dominant par poids (tie-break: ordre des faits mclef/2).
-mot_clef_dominant(L_norm,M) :-
-   findall(W-M0, (mclef(M0,W), member(M0,L_norm)), Pairs),
+% Ordonner les mots-cles par poids decroissant (tie-break: ordre des faits mclef/2).
+mots_cle_ordonnes(L_norm,MotsCle) :-
+   findall(M-W, (mclef(M,W), member(M,L_norm)), Pairs),
    Pairs \= [],
-   best_weight_pair(Pairs,M).
+   indexer_mots_cle(Pairs,1,Indexed),
+   keysort(Indexed,Sorted),
+   pairs_values(Sorted,MotsCle).
 
-best_weight_pair([W-M|Rest],BestM) :-
-   best_weight_pair(Rest,W,M,BestM).
+indexer_mots_cle([],_,[]).
+indexer_mots_cle([M-W|Rest],Index,[key(NegW,Index)-M|Out]) :-
+   NegW is -W,
+   Next is Index + 1,
+   indexer_mots_cle(Rest,Next,Out).
 
-best_weight_pair([],_,BestM,BestM).
-best_weight_pair([W-M|Rest],CurW,CurM,BestM) :-
-   (  W > CurW
-   -> NewW = W, NewM = M
-   ;  NewW = CurW, NewM = CurM
-   ),
-   best_weight_pair(Rest,NewW,NewM,BestM).
+essayer_mots_cle([M|Rest],L,Rep) :-
+   (  clause(regle_rep(M,_,Pattern,Rep),Body),
+      match_pattern(Pattern,L),
+      call(Body)
+   -> true
+   ;  essayer_mots_cle(Rest,L,Rep)
+   ).
 
 % ==============================================================================
 % SECTION: Normalisation et matching
@@ -728,6 +731,16 @@ regle_rep(boire,25,
 
 regle_rep(boire,26,
   [ est, ce, que, je, peux, le, boire, maintenant ],
+  Rep) :-
+    reponse_accessibilite(_,Rep).
+
+regle_rep(boire,27,
+  [ puis, je, le, boire, tout, de, suite ],
+  Rep) :-
+    reponse_accessibilite(_,Rep).
+
+regle_rep(boire,28,
+  [ puis, je, le, boire, maintenant ],
   Rep) :-
     reponse_accessibilite(_,Rep).
 
