@@ -48,7 +48,7 @@ produire_reponse([fin],[L1]) :-
 produire_reponse(L,Rep) :-
    normaliser_question(L,L_norm),
 %   write(L_norm),
-   mclef(M,_), member(M,L_norm),
+   mot_clef_dominant(L_norm,M),
    clause(regle_rep(M,_,Pattern,Rep),Body),
    match_pattern(Pattern,L),
    call(Body), !.
@@ -57,6 +57,23 @@ produire_reponse(_,[L1,L2, L3]) :-
    L1 = [je, ne, sais, pas, '.'],
    L2 = [les, etudiants, vont, m, '\'', aider, '.' ],
    L3 = ['vous le verrez !'].
+
+% Selectionner le mot-cle dominant par poids (tie-break: ordre des faits mclef/2).
+mot_clef_dominant(L_norm,M) :-
+   findall(W-M0, (mclef(M0,W), member(M0,L_norm)), Pairs),
+   Pairs \= [],
+   best_weight_pair(Pairs,M).
+
+best_weight_pair([W-M|Rest],BestM) :-
+   best_weight_pair(Rest,W,M,BestM).
+
+best_weight_pair([],_,BestM,BestM).
+best_weight_pair([W-M|Rest],CurW,CurM,BestM) :-
+   (  W > CurW
+   -> NewW = W, NewM = M
+   ;  NewW = CurW, NewM = CurM
+   ),
+   best_weight_pair(Rest,NewW,NewM,BestM).
 
 % ==============================================================================
 % SECTION: Normalisation et matching
